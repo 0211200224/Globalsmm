@@ -1,0 +1,135 @@
+// Prisma schema — GlobalSMM
+// See PLANO.md (section 4) for the business rationale behind this model.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  ERROR
+  CANCELED
+}
+
+enum TransactionType {
+  DEPOSIT
+  DEBIT
+  REFUND
+  COMMISSION_PAYOUT
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id         String   @id @default(cuid())
+  supabaseId String   @unique
+  email      String   @unique
+  name       String?
+  role       UserRole @default(USER)
+  tier       String   @default("standard")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  wallet           Wallet?
+  orders           Order[]
+  affiliateProfile AffiliateProfile?
+  referralsMade    AffiliateReferral[] @relation("ReferrerUser")
+  referredBy       AffiliateReferral?  @relation("ReferredUser")
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  balance   Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String            @id @default(cuid())
+  walletId    String
+  wallet      Wallet            @relation(fields: [walletId], references: [id])
+  type        TransactionType
+  status      TransactionStatus @default(PENDING)
+  amount      Decimal           @db.Decimal(12, 2)
+  method      String            @default("stripe")
+  externalRef String?
+  createdAt   DateTime          @default(now())
+}
+
+model ServiceCategory {
+  id   String @id @default(cuid())
+  name String @unique
+  icon String?
+
+  services Service[]
+}
+
+model Service {
+  id           String          @id @default(cuid())
+  categoryId   String
+  category     ServiceCategory @relation(fields: [categoryId], references: [id])
+  name         String
+  description  String?
+  pricePer1000 Decimal         @db.Decimal(10, 4)
+  minQuantity  Int
+  maxQuantity  Int
+  active       Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+
+  orders Order[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  serviceId     String
+  service       Service     @relation(fields: [serviceId], references: [id])
+  quantity      Int
+  targetLink    String
+  chargedAmount Decimal     @db.Decimal(12, 2)
+  status        OrderStatus @default(PENDING)
+  adminNote     String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model AffiliateProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  referralCode   String   @unique
+  commissionRate Decimal  @default(0.10) @db.Decimal(4, 2)
+  createdAt      DateTime @default(now())
+}
+
+model AffiliateReferral {
+  id               String   @id @default(cuid())
+  referrerId       String
+  referrer         User     @relation("ReferrerUser", fields: [referrerId], references: [id])
+  referredId       String   @unique
+  referred         User     @relation("ReferredUser", fields: [referredId], references: [id])
+  commissionEarned Decimal  @default(0) @db.Decimal(12, 2)
+  commissionPaid   Boolean  @default(false)
+  createdAt        DateTime @default(now())
+}
