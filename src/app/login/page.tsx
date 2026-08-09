@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
 import { createClient } from "@/lib/supabase/client";
-import { provisionUser } from "@/lib/actions/user";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,7 +22,7 @@ export default function LoginPage() {
     const password = String(formData.get("password") ?? "");
 
     const supabase = createClient();
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -34,20 +33,9 @@ export default function LoginPage() {
       return;
     }
 
-    if (data.user) {
-      // Self-heals accounts that exist in Supabase Auth without a matching
-      // Prisma row yet. Best-effort: a failure here shouldn't block a user
-      // who Supabase has already authenticated.
-      try {
-        await provisionUser({
-          supabaseId: data.user.id,
-          email: data.user.email ?? email,
-          name: (data.user.user_metadata?.name as string | undefined) ?? undefined,
-        });
-      } catch (err) {
-        console.error("Failed to provision user profile on login:", err);
-      }
-    }
+    // Note: the matching Prisma User/Wallet row is provisioned lazily by
+    // getCurrentUser() the first time an authenticated page loads — not
+    // here. See src/lib/actions/current-user.ts.
 
     router.push("/dashboard");
     router.refresh();

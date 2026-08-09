@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
 import { createClient } from "@/lib/supabase/client";
-import { provisionUser } from "@/lib/actions/user";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -37,17 +36,9 @@ export default function RegisterPage() {
       return;
     }
 
-    if (data.user) {
-      try {
-        await provisionUser({ supabaseId: data.user.id, email, name });
-      } catch {
-        setError(
-          "Your account was created, but we couldn't finish setting up your profile. Please try signing in — if that fails, contact support.",
-        );
-        setLoading(false);
-        return;
-      }
-    }
+    // Note: the matching Prisma User/Wallet row is provisioned lazily by
+    // getCurrentUser() the first time an authenticated page loads — not
+    // here. See src/lib/actions/current-user.ts.
 
     if (!data.session) {
       // Email confirmation is required by the Supabase project before a
