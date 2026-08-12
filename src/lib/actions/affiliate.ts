@@ -3,6 +3,8 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { MIN_WITHDRAWAL_USD } from "@/lib/constants";
+import { createNotification } from "@/lib/actions/notifications";
+import { formatUSD } from "@/lib/format";
 
 function slugify(input: string) {
   return input
@@ -116,10 +118,27 @@ export async function settleCommissionForOrder(
   orderId: string,
   outcome: "AVAILABLE" | "VOID",
 ) {
+  const affected = await prisma.referralCommission.findMany({
+    where: { orderId, status: "PENDING" },
+    include: { affiliate: true },
+  });
+
   await prisma.referralCommission.updateMany({
     where: { orderId, status: "PENDING" },
     data: { status: outcome },
   });
+
+  if (outcome === "AVAILABLE") {
+    for (const commission of affected) {
+      await createNotification({
+        userId: commission.affiliate.userId,
+        type: "REFERRAL_COMMISSION",
+        title: "Referral commission available",
+        body: `You earned ${formatUSD(commission.amount.toNumber())} — it's now available to withdraw or spend.`,
+        link: "/affiliate",
+      });
+    }
+  }
 }
 
 export async function getAffiliateSummary(userId: string) {

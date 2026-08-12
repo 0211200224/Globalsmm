@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminMobileNav } from "./AdminMobileNav";
 import { TopBar } from "@/components/layout/TopBar";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { getCurrentUser } from "@/lib/actions/current-user";
+import { getMyNotifications } from "@/lib/actions/notifications";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -10,6 +12,7 @@ type AdminShellProps = {
 
 export async function AdminShell({ children }: AdminShellProps) {
   const user = await getCurrentUser();
+  const { notifications, unreadCount } = await getMyNotifications();
 
   return (
     <div className="min-h-screen">
@@ -19,6 +22,9 @@ export async function AdminShell({ children }: AdminShellProps) {
           userName={user?.name || user?.email || "Admin"}
           userRole="Administrator"
           leftSlot={<AdminMobileNav />}
+          notificationSlot={
+            <NotificationBell notifications={notifications} unreadCount={unreadCount} />
+          }
         />
         <div className="p-stack-lg max-w-container-max mx-auto space-y-stack-lg">
           {children}

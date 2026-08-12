@@ -3,7 +3,16 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { assertIsAdmin } from "@/lib/actions/admin-guard";
+import { createNotification } from "@/lib/actions/notifications";
+import { formatUSD } from "@/lib/format";
 import type { WithdrawalStatus } from "@/generated/prisma/client";
+
+const STATUS_MESSAGES: Record<WithdrawalStatus, string> = {
+  PENDING: "is pending review.",
+  APPROVED: "has been approved and is being processed.",
+  PAID: "has been paid out.",
+  REJECTED: "was rejected. Contact support if you have questions.",
+};
 
 /**
  * Admin-only. Approving/rejecting a withdrawal only changes its status.
@@ -20,6 +29,7 @@ export async function setWithdrawalStatus(
 
   const withdrawal = await prisma.referralWithdrawal.findUnique({
     where: { id: withdrawalId },
+    include: { affiliate: true },
   });
   if (!withdrawal) return { success: false as const, error: "Withdrawal not found." };
 
@@ -47,11 +57,33 @@ export async function setWithdrawalStatus(
         where: { id: { in: idsToMark } },
         data: { status: "PAID" },
       });
+
+      await createNotification(
+        {
+          userId: withdrawal.affiliate.userId,
+          type: "WITHDRAWAL_STATUS",
+          title: `Your ${formatUSD(withdrawal.amount.toNumber())} withdrawal ${STATUS_MESSAGES.PAID}`,
+          body: "Funds have been sent — thanks for growing GlobalSMM!",
+          link: "/affiliate",
+        },
+        tx,
+      );
     });
   } else {
     await prisma.referralWithdrawal.update({
       where: { id: withdrawalId },
       data: { status },
+    });
+
+    await createNotification({
+      userId: withdrawal.affiliate.userId,
+      type: "WITHDRAWAL_STATUS",
+      title: `Your ${formatUSD(withdrawal.amount.toNumber())} withdrawal ${STATUS_MESSAGES[status]}`,
+      body:
+        status === "REJECTED"
+          ? "The requested amount was returned to your available balance."
+          : "We'll notify you again when it's paid.",
+      link: "/affiliate",
     });
   }
 

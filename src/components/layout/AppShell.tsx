@@ -3,7 +3,9 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
+import { NotificationBell } from "./NotificationBell";
 import { getCurrentUser } from "@/lib/actions/current-user";
+import { getMyNotifications } from "@/lib/actions/notifications";
 import { createClient } from "@/lib/supabase/server";
 
 type AppShellProps = {
@@ -26,12 +28,19 @@ export async function AppShell({ children }: AppShellProps) {
 
   const userName = user?.name || user?.email || "Account";
   const userRole = user ? formatRole(user.role, user.tier) : "Member";
+  const { notifications, unreadCount } = await getMyNotifications();
 
   return (
     <div className="min-h-screen">
       <Sidebar />
       <div className="md:ml-[280px] min-h-screen relative pb-20 md:pb-0">
-        <TopBar userName={userName} userRole={userRole} />
+        <TopBar
+          userName={userName}
+          userRole={userRole}
+          notificationSlot={
+            <NotificationBell notifications={notifications} unreadCount={unreadCount} />
+          }
+        />
         <div className="p-stack-lg max-w-container-max mx-auto space-y-stack-lg">
           {children}
         </div>

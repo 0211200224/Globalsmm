@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
+import { createNotification } from "@/lib/actions/notifications";
 import type { TicketStatus } from "@/generated/prisma/client";
 
 async function getRequester() {
@@ -97,6 +98,19 @@ export async function replyToTicket(ticketId: string, message: string) {
         where: { id: ticketId },
         data: { status: "OPEN" },
       });
+    }
+
+    if (isAdmin) {
+      await createNotification(
+        {
+          userId: ticket.userId,
+          type: "SUPPORT_REPLY",
+          title: `New reply on ticket #GS-T-${90000 + ticket.ticketNumber}`,
+          body: message.trim().slice(0, 140),
+          link: `/support/${ticketId}`,
+        },
+        tx,
+      );
     }
   });
 

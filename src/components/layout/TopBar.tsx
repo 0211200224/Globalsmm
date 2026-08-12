@@ -1,13 +1,21 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 type TopBarProps = {
   userName: string;
   userRole: string;
   avatarUrl?: string;
   leftSlot?: ReactNode;
+  notificationSlot?: ReactNode;
 };
 
-export function TopBar({ userName, userRole, avatarUrl, leftSlot }: TopBarProps) {
+export function TopBar({
+  userName,
+  userRole,
+  avatarUrl,
+  leftSlot,
+  notificationSlot,
+}: TopBarProps) {
   return (
     <header className="sticky top-0 w-full z-40 bg-surface/70 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center h-16 px-margin-x-mobile md:px-margin-x">
       <div className="flex items-center flex-1 max-w-xl">
@@ -25,19 +33,14 @@ export function TopBar({ userName, userRole, avatarUrl, leftSlot }: TopBarProps)
       </div>
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-4">
-          <button
-            aria-label="Notifications"
-            className="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-colors relative"
-          >
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-surface" />
-          </button>
-          <button
+          {notificationSlot}
+          <Link
+            href="/settings"
             aria-label="Settings"
             className="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-colors"
           >
             <span className="material-symbols-outlined">settings</span>
-          </button>
+          </Link>
         </div>
         <div className="hidden sm:flex items-center gap-3 pl-6 border-l border-outline-variant/10">
           <div className="text-right">

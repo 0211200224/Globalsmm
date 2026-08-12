@@ -4,7 +4,18 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { settleCommissionForOrder } from "@/lib/actions/affiliate";
 import { assertIsAdmin } from "@/lib/actions/admin-guard";
+import { createNotification } from "@/lib/actions/notifications";
 import type { OrderRowStatus } from "@/lib/types/orders";
+
+const STATUS_LABELS: Record<OrderRowStatus, string> = {
+  PENDING: "Pending",
+  PROCESSING: "Processing",
+  IN_PROGRESS: "In Progress",
+  COMPLETED: "Completed",
+  PARTIAL: "Partial",
+  CANCELED: "Canceled",
+  REFUNDED: "Refunded",
+};
 
 const REFUNDING_STATUSES: OrderRowStatus[] = ["CANCELED", "REFUNDED"];
 
@@ -52,6 +63,19 @@ export async function updateOrderStatus(orderId: string, status: OrderRowStatus)
     } else if (willRefund) {
       await settleCommissionForOrder(orderId, "VOID");
     }
+
+    await createNotification(
+      {
+        userId: order.userId,
+        type: "ORDER_STATUS",
+        title: `Order #GS-${90000 + order.orderNumber} is now ${STATUS_LABELS[status]}`,
+        body: willRefund
+          ? "Your order was canceled and the amount was refunded to your wallet."
+          : `Your order status was updated to ${STATUS_LABELS[status]}.`,
+        link: "/orders",
+      },
+      tx,
+    );
   });
 
   revalidatePath("/admin/orders");

@@ -14,13 +14,24 @@ export const metadata: Metadata = {
     "Enterprise-grade social media growth, high-speed API delivery, and precision metrics across 150+ countries.",
 };
 
+// Runs before first paint so the page never flashes the wrong theme.
+// Keep the storage key/default in sync with src/lib/theme.ts.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("gsmm-theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){document.documentElement.setAttribute("data-theme","dark");}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      data-theme="dark"
+      className={`${inter.variable} h-full antialiased`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="custom-scroll min-h-full flex flex-col bg-background text-on-background font-sans selection:bg-secondary/30">
         {children}
       </body>

@@ -63,6 +63,14 @@ enum TicketStatus {
   CLOSED
 }
 
+enum NotificationType {
+  ORDER_STATUS
+  SUPPORT_REPLY
+  REFERRAL_COMMISSION
+  WITHDRAWAL_STATUS
+  SYSTEM
+}
+
 model User {
   id         String   @id @default(cuid())
   supabaseId String   @unique
@@ -82,6 +90,7 @@ model User {
   referredBy       AffiliateReferral?  @relation("ReferredUser")
   supportTickets   SupportTicket[]
   supportMessages  SupportMessage[]
+  notifications    Notification[]
 }
 
 model Wallet {
@@ -245,4 +254,19 @@ model SupportMessage {
   createdAt    DateTime      @default(now())
 
   @@index([ticketId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  body      String
+  /// Optional in-app link the notification should navigate to when clicked.
+  link      String?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([userId, read])
 }

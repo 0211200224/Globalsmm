@@ -16,16 +16,16 @@ export function StatCard({ label, value, icon, accent = "primary" }: StatCardPro
 
   return (
     <div
-      className={`glass-card p-6 rounded-2xl border-l-4 ${borderColor} flex items-center justify-between`}
+      className={`stat-card-container glass-card p-6 rounded-2xl border-l-4 ${borderColor} flex items-center justify-between gap-3`}
     >
-      <div>
-        <div className="text-headline-lg text-on-surface font-bold mb-1">
+      <div className="min-w-0">
+        <div className="stat-card-value text-on-surface font-bold mb-1">
           {value}
         </div>
-        <div className="text-label-md text-on-surface-variant">{label}</div>
+        <div className="text-label-md text-on-surface-variant truncate">{label}</div>
       </div>
       <div
-        className={`w-12 h-12 rounded-lg flex items-center justify-center ${iconBg} ${iconColor}`}
+        className={`w-12 h-12 shrink-0 rounded-lg flex items-center justify-center ${iconBg} ${iconColor}`}
       >
         <span className="material-symbols-outlined">{icon}</span>
       </div>
