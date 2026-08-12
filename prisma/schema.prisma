@@ -18,9 +18,11 @@ enum UserRole {
 enum OrderStatus {
   PENDING
   PROCESSING
+  IN_PROGRESS
   COMPLETED
-  ERROR
+  PARTIAL
   CANCELED
+  REFUNDED
 }
 
 enum TransactionType {
@@ -36,6 +38,31 @@ enum TransactionStatus {
   FAILED
 }
 
+enum CommissionStatus {
+  /// Order hasn't completed yet — doesn't count toward the withdrawable balance.
+  PENDING
+  /// Order completed successfully — counts toward the withdrawable balance.
+  AVAILABLE
+  /// Paid out via a ReferralWithdrawal.
+  PAID
+  /// Order was canceled/refunded — this commission never materializes.
+  VOID
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  PAID
+  REJECTED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
 model User {
   id         String   @id @default(cuid())
   supabaseId String   @unique
@@ -43,6 +70,8 @@ model User {
   name       String?
   role       UserRole @default(USER)
   tier       String   @default("standard")
+  /// Admin-set. Blocked users are denied access at login (see proxy.ts / auth checks).
+  blocked    Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -51,6 +80,8 @@ model User {
   affiliateProfile AffiliateProfile?
   referralsMade    AffiliateReferral[] @relation("ReferrerUser")
   referredBy       AffiliateReferral?  @relation("ReferredUser")
+  supportTickets   SupportTicket[]
+  supportMessages  SupportMessage[]
 }
 
 model Wallet {
@@ -77,9 +108,11 @@ model Transaction {
 }
 
 model ServiceCategory {
-  id   String @id @default(cuid())
-  name String @unique
-  icon String?
+  id     String  @id @default(cuid())
+  name   String  @unique
+  icon   String?
+  /// Display order in the platform picker (lower = first).
+  sortOrder Int  @default(0)
 
   services Service[]
 }
@@ -88,8 +121,19 @@ model Service {
   id           String          @id @default(cuid())
   categoryId   String
   category     ServiceCategory @relation(fields: [categoryId], references: [id])
+  /// Cross-platform service type for the "browse by type" filter, e.g.
+  /// "Followers", "Likes", "Views", "Members", "Reactions"... Free-form
+  /// string on purpose (see PLANO.md 10.13 — new types must not need a
+  /// migration).
+  serviceType  String
   name         String
   description  String?
+  /// Material Symbols icon name.
+  icon         String          @default("bolt")
+  /// Optional highlight badge shown on the service card ("Hot", "Stable", "Elite").
+  badge        String?
+  /// Human-readable delivery speed shown on the service card, e.g. "Instant", "10m / 1k".
+  speedLabel   String          @default("Standard")
   pricePer1000 Decimal         @db.Decimal(10, 4)
   minQuantity  Int
   maxQuantity  Int
@@ -97,21 +141,32 @@ model Service {
   createdAt    DateTime        @default(now())
 
   orders Order[]
+
+  @@index([serviceType])
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  serviceId     String
-  service       Service     @relation(fields: [serviceId], references: [id])
-  quantity      Int
-  targetLink    String
-  chargedAmount Decimal     @db.Decimal(12, 2)
-  status        OrderStatus @default(PENDING)
-  adminNote     String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id                String      @id @default(cuid())
+  /// Short sequential number for the human-facing "#GS-xxxxx" order ID.
+  orderNumber       Int         @default(autoincrement()) @unique
+  userId            String
+  user              User        @relation(fields: [userId], references: [id])
+  serviceId         String
+  service           Service     @relation(fields: [serviceId], references: [id])
+  quantity          Int
+  /// How much of `quantity` has been delivered so far — drives the progress bar.
+  deliveredQuantity Int         @default(0)
+  targetLink        String
+  chargedAmount     Decimal     @db.Decimal(12, 2)
+  status            OrderStatus @default(PENDING)
+  adminNote         String?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  referralCommission ReferralCommission?
+  supportTickets     SupportTicket[]
+
+  @@index([userId])
 }
 
 model AffiliateProfile {
@@ -119,17 +174,75 @@ model AffiliateProfile {
   userId         String   @unique
   user           User     @relation(fields: [userId], references: [id])
   referralCode   String   @unique
-  commissionRate Decimal  @default(0.10) @db.Decimal(4, 2)
+  /// 5% of each qualifying order placed by a referred user (see PLANO.md section 7).
+  commissionRate Decimal  @default(0.05) @db.Decimal(4, 2)
   createdAt      DateTime @default(now())
+
+  commissions ReferralCommission[]
+  withdrawals ReferralWithdrawal[]
 }
 
 model AffiliateReferral {
-  id               String   @id @default(cuid())
-  referrerId       String
-  referrer         User     @relation("ReferrerUser", fields: [referrerId], references: [id])
-  referredId       String   @unique
-  referred         User     @relation("ReferredUser", fields: [referredId], references: [id])
-  commissionEarned Decimal  @default(0) @db.Decimal(12, 2)
-  commissionPaid   Boolean  @default(false)
-  createdAt        DateTime @default(now())
+  id         String   @id @default(cuid())
+  referrerId String
+  referrer   User     @relation("ReferrerUser", fields: [referrerId], references: [id])
+  referredId String   @unique
+  referred   User     @relation("ReferredUser", fields: [referredId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model ReferralCommission {
+  id          String            @id @default(cuid())
+  affiliateId String
+  affiliate   AffiliateProfile  @relation(fields: [affiliateId], references: [id])
+  orderId     String            @unique
+  order       Order             @relation(fields: [orderId], references: [id])
+  amount      Decimal           @db.Decimal(12, 2)
+  status      CommissionStatus  @default(PENDING)
+  createdAt   DateTime          @default(now())
+
+  @@index([affiliateId])
+}
+
+model ReferralWithdrawal {
+  id          String           @id @default(cuid())
+  affiliateId String
+  affiliate   AffiliateProfile @relation(fields: [affiliateId], references: [id])
+  amount      Decimal          @db.Decimal(12, 2)
+  status      WithdrawalStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+
+  @@index([affiliateId])
+}
+
+model SupportTicket {
+  id           String       @id @default(cuid())
+  /// Short sequential number for the human-facing "#GS-T-xxxxx" ticket ID.
+  ticketNumber Int          @default(autoincrement()) @unique
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  /// Optional — lets the customer point at exactly which order the issue is about.
+  orderId      String?
+  order        Order?       @relation(fields: [orderId], references: [id])
+  subject      String
+  status       TicketStatus @default(OPEN)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  messages SupportMessage[]
+
+  @@index([userId])
+}
+
+model SupportMessage {
+  id           String        @id @default(cuid())
+  ticketId     String
+  ticket       SupportTicket @relation(fields: [ticketId], references: [id])
+  authorId     String
+  author       User          @relation(fields: [authorId], references: [id])
+  isAdminReply Boolean       @default(false)
+  body         String
+  createdAt    DateTime      @default(now())
+
+  @@index([ticketId])
 }

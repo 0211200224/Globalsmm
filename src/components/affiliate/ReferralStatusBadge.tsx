@@ -1,23 +1,33 @@
-import type { ReferralStatus } from "@/app/affiliate/data";
+type CommissionStatus = "PENDING" | "AVAILABLE" | "PAID" | "VOID";
 
 const config: Record<
-  ReferralStatus,
+  CommissionStatus,
   { label: string; className: string; dotClass: string; pulse?: boolean }
 > = {
-  completed: {
-    label: "Completed",
+  AVAILABLE: {
+    label: "Available",
     className: "bg-green-500/10 text-green-400",
     dotClass: "bg-green-400",
   },
-  pending: {
+  PENDING: {
     label: "Pending",
     className: "bg-yellow-500/10 text-yellow-400",
     dotClass: "bg-yellow-400",
     pulse: true,
   },
+  PAID: {
+    label: "Paid Out",
+    className: "bg-primary/10 text-primary",
+    dotClass: "bg-primary",
+  },
+  VOID: {
+    label: "Void",
+    className: "bg-outline-variant/20 text-outline",
+    dotClass: "bg-outline",
+  },
 };
 
-export function ReferralStatusBadge({ status }: { status: ReferralStatus }) {
+export function ReferralStatusBadge({ status }: { status: CommissionStatus }) {
   const c = config[status];
   return (
     <span

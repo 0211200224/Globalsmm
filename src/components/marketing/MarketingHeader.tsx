@@ -1,11 +1,26 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 export function MarketingHeader() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <header className="sticky top-0 w-full z-40 backdrop-blur-md border-b border-white/5 shadow-sm bg-background/70">
       <div className="flex items-center justify-between px-margin-x-mobile md:px-margin-x h-16 max-w-container-max mx-auto">
         <div className="flex items-center gap-3">
-          <span className="material-symbols-outlined text-primary">menu</span>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            className="md:hidden -ml-2 p-2 text-primary rounded-full hover:bg-white/5 transition-colors"
+          >
+            <span className="material-symbols-outlined">
+              {menuOpen ? "close" : "menu"}
+            </span>
+          </button>
           <h1 className="text-headline-md font-bold text-primary">
             GlobalSMM
           </h1>
@@ -36,6 +51,39 @@ export function MarketingHeader() {
           </Link>
         </div>
       </div>
+
+      {menuOpen && (
+        <nav className="md:hidden flex flex-col px-margin-x-mobile pb-4 gap-1 border-t border-white/5">
+          <Link
+            className="text-label-md text-primary py-3"
+            href="/"
+            onClick={() => setMenuOpen(false)}
+          >
+            Dashboard
+          </Link>
+          <Link
+            className="text-label-md text-on-surface-variant py-3"
+            href="/services"
+            onClick={() => setMenuOpen(false)}
+          >
+            Services
+          </Link>
+          <a
+            className="text-label-md text-on-surface-variant py-3"
+            href="#"
+            onClick={() => setMenuOpen(false)}
+          >
+            API
+          </a>
+          <a
+            className="text-label-md text-on-surface-variant py-3"
+            href="#"
+            onClick={() => setMenuOpen(false)}
+          >
+            Support
+          </a>
+        </nav>
+      )}
     </header>
   );
 }

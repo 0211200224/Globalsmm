@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "migrate": "node scripts/with-direct-url.js npx prisma migrate dev",
+    "db:seed": "node scripts/with-direct-url.js npx prisma db seed"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
@@ -32,6 +34,7 @@
     "eslint-config-next": "16.2.12",
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }

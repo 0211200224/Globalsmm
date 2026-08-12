@@ -1,12 +1,18 @@
-import type { MockService } from "@/app/services/data";
+import type { CatalogService } from "@/lib/types/catalog";
 
-const badgeStyles: Record<NonNullable<MockService["badge"]>, string> = {
+const badgeStyles: Record<string, string> = {
   Hot: "bg-tertiary-container text-on-tertiary-container",
   Stable: "bg-surface-container-highest text-on-surface-variant",
   Elite: "bg-secondary-container text-on-secondary-container",
 };
 
-export function ServiceCard({ service }: { service: MockService }) {
+export function ServiceCard({
+  service,
+  onOrder,
+}: {
+  service: CatalogService;
+  onOrder: (service: CatalogService) => void;
+}) {
   return (
     <div className="glass-card p-6 rounded-xl flex flex-col justify-between group hover:shadow-xl hover:border-secondary/20 transition-all duration-300">
       <div>
@@ -16,12 +22,15 @@ export function ServiceCard({ service }: { service: MockService }) {
           </div>
           {service.badge && (
             <span
-              className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${badgeStyles[service.badge]}`}
+              className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${badgeStyles[service.badge] ?? badgeStyles.Stable}`}
             >
               {service.badge}
             </span>
           )}
         </div>
+        <p className="text-[11px] text-on-surface-variant/70 uppercase tracking-wider font-bold mb-1">
+          {service.categoryName} · {service.serviceType}
+        </p>
         <h3 className="text-headline-md mb-2 group-hover:text-secondary transition-colors">
           {service.name}
         </h3>
@@ -44,15 +53,20 @@ export function ServiceCard({ service }: { service: MockService }) {
               Avg. Speed
             </span>
             <span className="text-label-md text-on-surface">
-              {service.speed}
+              {service.speedLabel}
             </span>
           </div>
         </div>
+        <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
+          <span>Min: {service.minQuantity.toLocaleString("en-US")}</span>
+          <span>Max: {service.maxQuantity.toLocaleString("en-US")}</span>
+        </div>
         <button
           type="button"
+          onClick={() => onOrder(service)}
           className="w-full py-3 rounded-lg border border-outline-variant text-on-surface text-label-md hover:bg-surface-container-high active:scale-[0.98] transition-all"
         >
-          Details
+          Order Now
         </button>
       </div>
     </div>

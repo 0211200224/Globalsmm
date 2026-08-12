@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
+import { redirect } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
 import { getCurrentUser } from "@/lib/actions/current-user";
+import { createClient } from "@/lib/supabase/server";
 
 type AppShellProps = {
   children: ReactNode;
@@ -15,6 +17,12 @@ function formatRole(role: string, tier: string) {
 
 export async function AppShell({ children }: AppShellProps) {
   const user = await getCurrentUser();
+
+  if (user?.blocked) {
+    const supabase = await createClient();
+    await supabase.auth.signOut();
+    redirect("/login?blocked=1");
+  }
 
   const userName = user?.name || user?.email || "Account";
   const userRole = user ? formatRole(user.role, user.tier) : "Member";

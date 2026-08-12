@@ -1,17 +1,25 @@
 import type { ReactNode } from "react";
 import { AdminSidebar } from "./AdminSidebar";
+import { AdminMobileNav } from "./AdminMobileNav";
 import { TopBar } from "@/components/layout/TopBar";
+import { getCurrentUser } from "@/lib/actions/current-user";
 
 type AdminShellProps = {
   children: ReactNode;
 };
 
-export function AdminShell({ children }: AdminShellProps) {
+export async function AdminShell({ children }: AdminShellProps) {
+  const user = await getCurrentUser();
+
   return (
     <div className="min-h-screen">
       <AdminSidebar />
       <div className="md:ml-[280px] min-h-screen relative">
-        <TopBar userName="Alex Thompson" userRole="Administrator" />
+        <TopBar
+          userName={user?.name || user?.email || "Admin"}
+          userRole="Administrator"
+          leftSlot={<AdminMobileNav />}
+        />
         <div className="p-stack-lg max-w-container-max mx-auto space-y-stack-lg">
           {children}
         </div>

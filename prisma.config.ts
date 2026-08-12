@@ -7,7 +7,15 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts",
   },
+  // `datasource.directUrl` doesn't exist in this Prisma version's config type
+  // (only `url` and `shadowDatabaseUrl` do — checked node_modules/@prisma/config
+  // directly). Migrations need session-level features the Transaction pooler
+  // (used in DATABASE_URL at app runtime for serverless) doesn't support, so
+  // `prisma migrate`/`prisma db seed` must be run with DATABASE_URL temporarily
+  // overridden to DIRECT_URL (the Session pooler) at the shell level — see
+  // package.json's `migrate`/`db:seed` scripts.
   datasource: {
     url: process.env["DATABASE_URL"],
   },

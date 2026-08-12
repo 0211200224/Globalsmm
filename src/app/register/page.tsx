@@ -23,11 +23,16 @@ export default function RegisterPage() {
     const email = String(formData.get("email") ?? "");
     const password = String(formData.get("password") ?? "");
 
+    // Read directly from the URL instead of useSearchParams() so this page
+    // can stay statically prerendered (useSearchParams forces a Suspense
+    // boundary / dynamic rendering) — we only need the code at submit time.
+    const referredByCode = new URLSearchParams(window.location.search).get("ref");
+
     const supabase = createClient();
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: { data: { name, referredByCode } },
     });
 
     if (signUpError) {

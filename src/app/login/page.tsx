@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
 import { createClient } from "@/lib/supabase/client";
 
@@ -11,6 +11,17 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Read directly from the URL instead of useSearchParams() so this page
+    // can stay statically prerendered. Must run post-mount (not as a lazy
+    // useState initializer) so the client's first render still matches the
+    // server-rendered HTML — window/location aren't available during SSR.
+    if (new URLSearchParams(window.location.search).get("blocked")) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError("Your account has been blocked. Contact support for help.");
+    }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

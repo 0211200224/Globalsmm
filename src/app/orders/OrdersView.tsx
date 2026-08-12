@@ -3,29 +3,43 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { OrderRow } from "@/components/orders/OrderRow";
-import { mockOrders, type OrderRowStatus } from "./data";
+import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
 
-const tabs: Array<{ label: string; status: OrderRowStatus | "all" }> = [
-  { label: "All Orders", status: "all" },
-  { label: "Active", status: "pending" },
-  { label: "Processing", status: "processing" },
-  { label: "Completed", status: "completed" },
-  { label: "Canceled", status: "error" },
+const tabs: Array<{ label: string; statuses: OrderRowStatus[] | "all" }> = [
+  { label: "All Orders", statuses: "all" },
+  { label: "Active", statuses: ["PENDING", "PROCESSING", "IN_PROGRESS"] },
+  { label: "Completed", statuses: ["COMPLETED"] },
+  { label: "Partial", statuses: ["PARTIAL"] },
+  { label: "Canceled / Refunded", statuses: ["CANCELED", "REFUNDED"] },
 ];
 
-export function OrdersView() {
-  const [activeTab, setActiveTab] = useState<OrderRowStatus | "all">("all");
+type Stats = {
+  total: number;
+  active: number;
+  completed: number;
+  totalSpending: string;
+};
+
+export function OrdersView({
+  orders,
+  stats,
+}: {
+  orders: OrderRowData[];
+  stats: Stats;
+}) {
+  const [activeTab, setActiveTab] = useState(0);
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
-    return mockOrders.filter((order) => {
-      const matchesTab = activeTab === "all" || order.status === activeTab;
-      const matchesQuery = order.orderId
-        .toLowerCase()
-        .includes(query.toLowerCase());
+    const statuses = tabs[activeTab].statuses;
+    return orders.filter((order) => {
+      const matchesTab = statuses === "all" || statuses.includes(order.status);
+      const matchesQuery =
+        order.orderCode.toLowerCase().includes(query.toLowerCase()) ||
+        order.serviceName.toLowerCase().includes(query.toLowerCase());
       return matchesTab && matchesQuery;
     });
-  }, [activeTab, query]);
+  }, [orders, activeTab, query]);
 
   return (
     <>
@@ -40,26 +54,15 @@ export function OrdersView() {
           <p className="text-label-sm text-on-surface-variant mb-1">
             Total Orders
           </p>
-          <h3 className="text-headline-lg text-on-surface">1,284</h3>
-          <div className="flex items-center gap-1 mt-2 text-emerald-400 text-label-sm">
-            <span className="material-symbols-outlined text-sm">
-              trending_up
-            </span>
-            <span>+12% this month</span>
-          </div>
+          <h3 className="text-headline-lg text-on-surface">{stats.total}</h3>
         </div>
 
         <div className="bg-surface-container-low border border-white/5 p-6 rounded-xl hover:border-secondary/20 transition-all group relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span className="material-symbols-outlined text-6xl">sync</span>
           </div>
-          <p className="text-label-sm text-on-surface-variant mb-1">
-            Processing
-          </p>
-          <h3 className="text-headline-lg text-on-surface">12</h3>
-          <div className="flex items-center gap-1 mt-2 text-on-surface-variant text-label-sm">
-            <span>Active right now</span>
-          </div>
+          <p className="text-label-sm text-on-surface-variant mb-1">Active</p>
+          <h3 className="text-headline-lg text-on-surface">{stats.active}</h3>
         </div>
 
         <div className="bg-surface-container-low border border-white/5 p-6 rounded-xl hover:border-secondary/20 transition-all group relative overflow-hidden">
@@ -71,38 +74,29 @@ export function OrdersView() {
           <p className="text-label-sm text-on-surface-variant mb-1">
             Completed
           </p>
-          <h3 className="text-headline-lg text-on-surface">1,248</h3>
-          <div className="flex items-center gap-1 mt-2 text-emerald-400 text-label-sm">
-            <span>98.2% Success Rate</span>
-          </div>
+          <h3 className="text-headline-lg text-on-surface">{stats.completed}</h3>
         </div>
 
         <div className="bg-secondary-container border border-white/5 p-6 rounded-xl shadow-lg relative overflow-hidden">
           <p className="text-label-sm text-on-secondary-container mb-1 opacity-80">
-            Spending
+            Total Spending
           </p>
           <h3 className="text-headline-lg text-on-secondary-container">
-            $4,290.45
+            {stats.totalSpending}
           </h3>
-          <button
-            type="button"
-            className="mt-4 px-4 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-full text-label-sm transition-all border border-white/10"
-          >
-            View Statement
-          </button>
         </div>
       </section>
 
       {/* Order Management Interface */}
       <section className="bg-surface-container-low rounded-2xl border border-white/5 shadow-2xl overflow-hidden">
         <div className="flex items-center gap-8 px-6 border-b border-white/5 overflow-x-auto">
-          {tabs.map((tab) => (
+          {tabs.map((tab, index) => (
             <button
               key={tab.label}
               type="button"
-              onClick={() => setActiveTab(tab.status)}
+              onClick={() => setActiveTab(index)}
               className={
-                activeTab === tab.status
+                activeTab === index
                   ? "py-5 text-label-md text-secondary border-b-2 border-secondary whitespace-nowrap"
                   : "py-5 text-label-md text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap"
               }
@@ -116,7 +110,7 @@ export function OrdersView() {
             </span>
             <input
               className="bg-transparent border-none focus:ring-0 text-body-sm text-on-surface placeholder:text-on-surface-variant/50 w-32 md:w-48"
-              placeholder="Search Order ID..."
+              placeholder="Search Order ID or service..."
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -127,55 +121,13 @@ export function OrdersView() {
         <div className="p-6 space-y-4">
           {filtered.length === 0 ? (
             <p className="text-center text-body-md text-on-surface-variant py-12">
-              No orders match this filter.
+              {orders.length === 0
+                ? "You haven't placed any orders yet."
+                : "No orders match this filter."}
             </p>
           ) : (
             filtered.map((order) => <OrderRow key={order.id} order={order} />)
           )}
-        </div>
-
-        <div className="p-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-label-sm text-on-surface-variant">
-            Showing {filtered.length} of 1,284 orders
-          </p>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-white/5 bg-surface-container-high text-on-surface-variant disabled:opacity-30"
-            >
-              <span className="material-symbols-outlined">
-                chevron_left
-              </span>
-            </button>
-            <button
-              type="button"
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-secondary bg-secondary-container text-on-secondary-container font-bold text-label-md"
-            >
-              1
-            </button>
-            <button
-              type="button"
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-white/5 hover:bg-surface-container-high transition-colors text-on-surface-variant text-label-md"
-            >
-              2
-            </button>
-            <button
-              type="button"
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-white/5 hover:bg-surface-container-high transition-colors text-on-surface-variant text-label-md"
-            >
-              3
-            </button>
-            <span className="text-on-surface-variant px-2">...</span>
-            <button
-              type="button"
-              className="w-10 h-10 flex items-center justify-center rounded-lg border border-white/5 hover:bg-surface-container-high transition-colors text-on-surface-variant"
-            >
-              <span className="material-symbols-outlined">
-                chevron_right
-              </span>
-            </button>
-          </div>
         </div>
       </section>
 
