@@ -16,6 +16,9 @@ export type EditableService = {
   pricePer1000: number;
   minQuantity: number;
   maxQuantity: number;
+  qualityScore: number | null;
+  retentionPercent: number | null;
+  refillDays: number;
 };
 
 export function ServiceFormModal({
@@ -40,6 +43,9 @@ export function ServiceFormModal({
       pricePer1000: 1,
       minQuantity: 100,
       maxQuantity: 10000,
+      qualityScore: null,
+      retentionPercent: null,
+      refillDays: 30,
     },
   );
   const [loading, setLoading] = useState(false);
@@ -207,6 +213,64 @@ export function ServiceFormModal({
               <option value="Stable">Stable</option>
               <option value="Elite">Elite</option>
             </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-label-sm text-on-surface-variant">
+              Quality score (0-10, optional)
+            </label>
+            <input
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
+              type="number"
+              step="0.1"
+              min="0"
+              max="10"
+              value={form.qualityScore ?? ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  qualityScore: e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+              placeholder="e.g. 9.4"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-label-sm text-on-surface-variant">
+              Avg. retention % (0-100, optional)
+            </label>
+            <input
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
+              type="number"
+              min="0"
+              max="100"
+              value={form.retentionPercent ?? ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  retentionPercent: e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+              placeholder="e.g. 90"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-label-sm text-on-surface-variant">
+              Refill guarantee (days, 0 = none)
+            </label>
+            <input
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
+              type="number"
+              min="0"
+              value={form.refillDays}
+              onChange={(e) => setForm({ ...form, refillDays: Number(e.target.value) })}
+              required
+            />
+            <p className="text-label-sm text-on-surface-variant/60">
+              Customers can self-serve one auto-approved refill within this window.
+            </p>
           </div>
 
           <div className="md:col-span-2 flex justify-end gap-2 pt-2">

@@ -15,6 +15,9 @@ export type ServiceInput = {
   pricePer1000: number;
   minQuantity: number;
   maxQuantity: number;
+  qualityScore?: number | null;
+  retentionPercent?: number | null;
+  refillDays: number;
 };
 
 function validateServiceInput(input: ServiceInput): string | null {
@@ -27,6 +30,20 @@ function validateServiceInput(input: ServiceInput): string | null {
     return "Minimum quantity must be a positive whole number.";
   if (!Number.isInteger(input.maxQuantity) || input.maxQuantity < input.minQuantity)
     return "Maximum quantity must be greater than or equal to the minimum.";
+  if (
+    input.qualityScore != null &&
+    (!Number.isFinite(input.qualityScore) || input.qualityScore < 0 || input.qualityScore > 10)
+  )
+    return "Quality score must be between 0 and 10.";
+  if (
+    input.retentionPercent != null &&
+    (!Number.isInteger(input.retentionPercent) ||
+      input.retentionPercent < 0 ||
+      input.retentionPercent > 100)
+  )
+    return "Retention must be a whole number between 0 and 100.";
+  if (!Number.isInteger(input.refillDays) || input.refillDays < 0)
+    return "Refill days must be zero or a positive whole number.";
   return null;
 }
 
@@ -48,6 +65,9 @@ export async function createService(input: ServiceInput) {
       pricePer1000: input.pricePer1000,
       minQuantity: input.minQuantity,
       maxQuantity: input.maxQuantity,
+      qualityScore: input.qualityScore ?? null,
+      retentionPercent: input.retentionPercent ?? null,
+      refillDays: input.refillDays,
     },
   });
 
@@ -75,6 +95,9 @@ export async function updateService(id: string, input: ServiceInput) {
       pricePer1000: input.pricePer1000,
       minQuantity: input.minQuantity,
       maxQuantity: input.maxQuantity,
+      qualityScore: input.qualityScore ?? null,
+      retentionPercent: input.retentionPercent ?? null,
+      refillDays: input.refillDays,
     },
   });
 

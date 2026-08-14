@@ -31,6 +31,9 @@ export default async function AdminServicesPage() {
       pricePer1000: service.pricePer1000.toNumber(),
       minQuantity: service.minQuantity,
       maxQuantity: service.maxQuantity,
+      qualityScore: service.qualityScore?.toNumber() ?? null,
+      retentionPercent: service.retentionPercent,
+      refillDays: service.refillDays,
       active: service.active,
     })),
   );

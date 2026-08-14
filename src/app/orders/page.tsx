@@ -13,26 +13,42 @@ export default async function OrdersPage() {
   const dbOrders = user
     ? await prisma.order.findMany({
         where: { userId: user.id },
-        include: { service: true },
+        include: { service: true, refillRequests: true },
         orderBy: { createdAt: "desc" },
       })
     : [];
 
-  const orders: OrderRowData[] = dbOrders.map((order) => ({
-    id: order.id,
-    orderCode: `#GS-${90000 + order.orderNumber}`,
-    serviceName: order.service.name,
-    serviceIcon: order.service.icon,
-    quantity: order.quantity,
-    deliveredQuantity: order.deliveredQuantity,
-    status: order.status as OrderRowStatus,
-    chargedAmount: formatUSD(order.chargedAmount.toNumber()),
-    createdAtLabel: order.createdAt.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
-  }));
+  const now = new Date();
+
+  const orders: OrderRowData[] = dbOrders.map((order) => {
+    const refillDeadline = new Date(order.createdAt);
+    refillDeadline.setDate(refillDeadline.getDate() + order.service.refillDays);
+
+    const canRefill =
+      (order.status === "COMPLETED" || order.status === "PARTIAL") &&
+      order.service.refillDays > 0 &&
+      order.refillRequests.length === 0 &&
+      now <= refillDeadline;
+
+    return {
+      id: order.id,
+      orderCode: `#GS-${90000 + order.orderNumber}`,
+      serviceName: order.service.name,
+      serviceIcon: order.service.icon,
+      quantity: order.quantity,
+      deliveredQuantity: order.deliveredQuantity,
+      status: order.status as OrderRowStatus,
+      chargedAmount: formatUSD(order.chargedAmount.toNumber()),
+      createdAtLabel: order.createdAt.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }),
+      canCancel: order.status === "PENDING",
+      canRefill,
+      refillDays: order.service.refillDays,
+    };
+  });
 
   const stats = {
     total: orders.length,

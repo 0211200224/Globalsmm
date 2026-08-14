@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createOrder } from "@/lib/actions/orders";
 import { formatUSD } from "@/lib/format";
 import type { CatalogService } from "@/lib/types/catalog";
+import { ServiceQualityStats } from "./ServiceQualityStats";
 
 export function OrderModal({
   service,
@@ -85,6 +86,7 @@ export function OrderModal({
                 </p>
                 <h3 className="text-headline-md text-on-surface">{service.name}</h3>
               </div>
+
               <button
                 type="button"
                 onClick={onClose}
@@ -94,6 +96,8 @@ export function OrderModal({
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
+
+            <ServiceQualityStats service={service} />
 
             {error && (
               <div className="bg-error-container/20 border border-error/30 text-error text-body-sm rounded-lg px-4 py-3 mb-4">

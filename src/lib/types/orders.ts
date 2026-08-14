@@ -17,4 +17,7 @@ export type OrderRowData = {
   status: OrderRowStatus;
   chargedAmount: string;
   createdAtLabel: string;
+  canCancel?: boolean;
+  canRefill?: boolean;
+  refillDays?: number | null;
 };

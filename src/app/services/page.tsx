@@ -31,6 +31,9 @@ export default async function ServicesPage() {
       minQuantity: service.minQuantity,
       maxQuantity: service.maxQuantity,
       categoryName: category.name,
+      qualityScore: service.qualityScore?.toNumber() ?? null,
+      retentionPercent: service.retentionPercent,
+      refillDays: service.refillDays,
     })),
   }));
 

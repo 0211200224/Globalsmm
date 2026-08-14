@@ -1,4 +1,5 @@
 import type { CatalogService } from "@/lib/types/catalog";
+import { ServiceQualityStats } from "./ServiceQualityStats";
 
 const badgeStyles: Record<string, string> = {
   Hot: "bg-tertiary-container text-on-tertiary-container",
@@ -39,24 +40,15 @@ export function ServiceCard({
         </p>
       </div>
       <div className="space-y-4">
-        <div className="flex items-center justify-between py-3 border-y border-white/5">
-          <div className="flex flex-col">
-            <span className="text-[10px] text-outline uppercase tracking-wider font-bold">
-              Price / 1k
-            </span>
-            <span className="text-headline-md text-secondary">
-              {service.pricePer1000}
-            </span>
-          </div>
-          <div className="flex flex-col text-right">
-            <span className="text-[10px] text-outline uppercase tracking-wider font-bold">
-              Avg. Speed
-            </span>
-            <span className="text-label-md text-on-surface">
-              {service.speedLabel}
-            </span>
-          </div>
+        <div className="flex flex-col">
+          <span className="text-[10px] text-outline uppercase tracking-wider font-bold">
+            Price / 1k
+          </span>
+          <span className="text-headline-md text-secondary">
+            {service.pricePer1000}
+          </span>
         </div>
+        <ServiceQualityStats service={service} />
         <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
           <span>Min: {service.minQuantity.toLocaleString("en-US")}</span>
           <span>Max: {service.maxQuantity.toLocaleString("en-US")}</span>

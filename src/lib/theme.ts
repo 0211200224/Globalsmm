@@ -13,6 +13,9 @@ export function useTheme() {
 
   useEffect(() => {
     const current = document.documentElement.getAttribute("data-theme");
+    // Syncs React state with the data-theme attribute the anti-flash inline
+    // script (layout.tsx) already set on <html> before hydration.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(current === "light" ? "light" : "dark");
   }, []);
 

@@ -146,6 +146,13 @@ model Service {
   pricePer1000 Decimal         @db.Decimal(10, 4)
   minQuantity  Int
   maxQuantity  Int
+  /// Out of 10, one decimal (e.g. 9.4). Null = not rated yet, hidden on the card.
+  qualityScore    Decimal? @db.Decimal(3, 1)
+  /// 0-100. Null = not measured yet, hidden on the card.
+  retentionPercent Int?
+  /// Refill guarantee window in days from order creation. 0 = no guarantee
+  /// (no refill request allowed for orders of this service).
+  refillDays       Int      @default(0)
   active       Boolean         @default(true)
   createdAt    DateTime        @default(now())
 
@@ -174,6 +181,7 @@ model Order {
 
   referralCommission ReferralCommission?
   supportTickets     SupportTicket[]
+  refillRequests     RefillRequest[]
 
   @@index([userId])
 }
@@ -254,6 +262,17 @@ model SupportMessage {
   createdAt    DateTime      @default(now())
 
   @@index([ticketId])
+}
+
+/// One auto-approved 30-day refill claim per order — see requestRefill in
+/// src/lib/actions/orders.ts. Fulfillment is still manual (see PLANO.md),
+/// so "automatic" here means the eligibility check is instant and skips
+/// the support-ticket queue, not that redelivery itself is automated.
+model RefillRequest {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model Notification {

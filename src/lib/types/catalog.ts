@@ -11,6 +11,9 @@ export type CatalogService = {
   minQuantity: number;
   maxQuantity: number;
   categoryName: string;
+  qualityScore: number | null;
+  retentionPercent: number | null;
+  refillDays: number;
 };
 
 export type CatalogCategory = {

@@ -37,6 +37,7 @@ export function SettingsView({
   useEffect(() => {
     try {
       const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (stored) setLanguage(stored);
     } catch {
       // Storage unavailable — default to English.
