@@ -2,6 +2,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { StatCard } from "@/components/ui/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
+import { VipTierCard } from "@/components/dashboard/VipTierCard";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { getAffiliateSummary } from "@/lib/actions/affiliate";
 import { prisma } from "@/lib/prisma";
@@ -47,7 +48,7 @@ export default async function DashboardPage() {
     createdAtLabel: order.createdAt.toLocaleDateString("en-US"),
   }));
 
-  const [totalOrders, activeOrders, completedOrders, spendingAgg, affiliateSummary] = user
+  const [totalOrders, activeOrders, completedOrders, spendingAgg, qualifyingSpendAgg, affiliateSummary] = user
     ? await Promise.all([
         prisma.order.count({ where: { userId: user.id } }),
         prisma.order.count({
@@ -58,11 +59,16 @@ export default async function DashboardPage() {
           where: { userId: user.id },
           _sum: { chargedAmount: true },
         }),
+        prisma.order.aggregate({
+          where: { userId: user.id, status: { notIn: ["CANCELED", "REFUNDED"] } },
+          _sum: { chargedAmount: true },
+        }),
         getAffiliateSummary(user.id),
       ])
-    : [0, 0, 0, { _sum: { chargedAmount: null } }, null];
+    : [0, 0, 0, { _sum: { chargedAmount: null } }, { _sum: { chargedAmount: null } }, null];
 
   const totalSpending = formatUSD(spendingAgg._sum.chargedAmount?.toNumber() ?? 0);
+  const lifetimeSpend = qualifyingSpendAgg._sum.chargedAmount?.toNumber() ?? 0;
   const referralBalance = formatUSD(affiliateSummary?.available ?? 0);
 
   return (
@@ -84,6 +90,8 @@ export default async function DashboardPage() {
         <StatCard label="Completed Orders" value={String(completedOrders)} icon="check_circle" accent="primary" />
         <StatCard label="Total Spending" value={totalSpending} icon="payments" accent="primary" />
       </div>
+
+      <VipTierCard lifetimeSpend={lifetimeSpend} />
 
       <DataTable
         title="Recent Orders"

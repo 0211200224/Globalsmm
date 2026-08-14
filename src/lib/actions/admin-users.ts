@@ -15,6 +15,13 @@ export async function setUserBlocked(userId: string, blocked: boolean) {
   return { success: true as const };
 }
 
+export async function setUserReseller(userId: string, isReseller: boolean) {
+  await assertIsAdmin();
+  await prisma.user.update({ where: { id: userId }, data: { isReseller } });
+  revalidatePath("/admin/users");
+  return { success: true as const };
+}
+
 export async function adjustWalletBalance(userId: string, amount: number) {
   await assertIsAdmin();
 

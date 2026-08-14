@@ -1,19 +1,35 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
+import { getCurrentUser } from "@/lib/actions/current-user";
+import { getEffectiveDiscountPercent } from "@/lib/vip";
 import type { CatalogCategory } from "@/lib/types/catalog";
 import { ServicesView } from "./ServicesView";
 
 export default async function ServicesPage() {
-  const dbCategories = await prisma.serviceCategory.findMany({
-    orderBy: { sortOrder: "asc" },
-    include: {
-      services: {
-        where: { active: true },
-        orderBy: { name: "asc" },
+  const user = await getCurrentUser();
+
+  const [dbCategories, spendAgg] = await Promise.all([
+    prisma.serviceCategory.findMany({
+      orderBy: { sortOrder: "asc" },
+      include: {
+        services: {
+          where: { active: true },
+          orderBy: { name: "asc" },
+        },
       },
-    },
-  });
+    }),
+    user
+      ? prisma.order.aggregate({
+          where: { userId: user.id, status: { notIn: ["CANCELED", "REFUNDED"] } },
+          _sum: { chargedAmount: true },
+        })
+      : Promise.resolve({ _sum: { chargedAmount: null } }),
+  ]);
+
+  const discountPercent = user
+    ? getEffectiveDiscountPercent(spendAgg._sum.chargedAmount?.toNumber() ?? 0, user.isReseller)
+    : 0;
 
   const categories: CatalogCategory[] = dbCategories.map((category) => ({
     name: category.name,
@@ -39,7 +55,7 @@ export default async function ServicesPage() {
 
   return (
     <AppShell>
-      <ServicesView categories={categories} />
+      <ServicesView categories={categories} discountPercent={discountPercent} />
     </AppShell>
   );
 }

@@ -71,6 +71,11 @@ enum NotificationType {
   SYSTEM
 }
 
+enum OrderSource {
+  WEB
+  API
+}
+
 model User {
   id         String   @id @default(cuid())
   supabaseId String   @unique
@@ -80,6 +85,11 @@ model User {
   tier       String   @default("standard")
   /// Admin-set. Blocked users are denied access at login (see proxy.ts / auth checks).
   blocked    Boolean  @default(false)
+  /// Admin-set. Grants the reseller discount rate (see src/lib/vip.ts) —
+  /// independent of the VIP spend-tier system.
+  isReseller Boolean  @default(false)
+  /// Self-service, generated on first visit to /api. Null until then.
+  apiKey     String?  @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
@@ -175,6 +185,8 @@ model Order {
   targetLink        String
   chargedAmount     Decimal     @db.Decimal(12, 2)
   status            OrderStatus @default(PENDING)
+  /// WEB = placed through the dashboard, API = placed by a reseller via /api/v2.
+  source            OrderSource @default(WEB)
   adminNote         String?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt

@@ -9,9 +9,11 @@ import { ServiceQualityStats } from "./ServiceQualityStats";
 
 export function OrderModal({
   service,
+  discountPercent,
   onClose,
 }: {
   service: CatalogService;
+  discountPercent: number;
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -21,7 +23,8 @@ export function OrderModal({
   const [error, setError] = useState<string | null>(null);
   const [successOrderNumber, setSuccessOrderNumber] = useState<number | null>(null);
 
-  const total = (quantity / 1000) * service.pricePer1000Raw;
+  const basePrice = (quantity / 1000) * service.pricePer1000Raw;
+  const total = basePrice * (1 - discountPercent / 100);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -148,10 +151,24 @@ export function OrderModal({
               </div>
 
               <div className="flex items-center justify-between py-4 border-y border-white/5">
-                <span className="text-label-md text-on-surface-variant">Total Price</span>
-                <span className="text-headline-md text-secondary font-mono">
-                  {formatUSD(Number.isFinite(total) ? total : 0)}
-                </span>
+                <div>
+                  <span className="text-label-md text-on-surface-variant">Total Price</span>
+                  {discountPercent > 0 && (
+                    <p className="text-label-sm text-tertiary font-medium">
+                      {discountPercent}% tier discount applied
+                    </p>
+                  )}
+                </div>
+                <div className="text-right">
+                  {discountPercent > 0 && (
+                    <span className="block text-label-sm text-on-surface-variant/60 line-through font-mono">
+                      {formatUSD(Number.isFinite(basePrice) ? basePrice : 0)}
+                    </span>
+                  )}
+                  <span className="text-headline-md text-secondary font-mono">
+                    {formatUSD(Number.isFinite(total) ? total : 0)}
+                  </span>
+                </div>
               </div>
 
               <button

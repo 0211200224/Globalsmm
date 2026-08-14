@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { Pill } from "@/components/ui/Pill";
-import { setUserBlocked, adjustWalletBalance } from "@/lib/actions/admin-users";
+import { setUserBlocked, setUserReseller, adjustWalletBalance } from "@/lib/actions/admin-users";
 import { formatUSD } from "@/lib/format";
 
 export type AdminUserRow = {
@@ -12,7 +12,9 @@ export type AdminUserRow = {
   name: string;
   email: string;
   role: "USER" | "ADMIN";
-  tier: string;
+  vipTierName: string;
+  lifetimeSpend: number;
+  isReseller: boolean;
   walletBalance: number;
   blocked: boolean;
   joinedAtLabel: string;
@@ -35,6 +37,11 @@ export function UsersView({ users }: { users: AdminUserRow[] }) {
       alert(result.error);
       return;
     }
+    router.refresh();
+  }
+
+  async function handleToggleReseller(user: AdminUserRow) {
+    await setUserReseller(user.id, !user.isReseller);
     router.refresh();
   }
 
@@ -71,9 +78,20 @@ export function UsersView({ users }: { users: AdminUserRow[] }) {
     {
       header: "Role / Tier",
       render: (row) => (
-        <Pill tone={row.role === "ADMIN" ? "info" : "neutral"}>
-          {row.role === "ADMIN" ? "Admin" : row.tier}
-        </Pill>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Pill tone={row.role === "ADMIN" ? "info" : "neutral"}>
+            {row.role === "ADMIN" ? "Admin" : row.vipTierName}
+          </Pill>
+          {row.isReseller && <Pill tone="warning">Reseller</Pill>}
+        </div>
+      ),
+    },
+    {
+      header: "Lifetime Spend",
+      render: (row) => (
+        <span className="font-mono text-on-surface-variant">
+          {formatUSD(row.lifetimeSpend)}
+        </span>
       ),
     },
     {
@@ -105,6 +123,17 @@ export function UsersView({ users }: { users: AdminUserRow[] }) {
             className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors disabled:opacity-50"
           >
             Adjust Balance
+          </button>
+          <button
+            type="button"
+            onClick={() => handleToggleReseller(row)}
+            className={
+              row.isReseller
+                ? "px-3 py-1.5 rounded-lg border border-tertiary/30 text-tertiary hover:bg-tertiary/10 text-label-sm transition-colors"
+                : "px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
+            }
+          >
+            {row.isReseller ? "Remove Reseller" : "Make Reseller"}
           </button>
           <button
             type="button"

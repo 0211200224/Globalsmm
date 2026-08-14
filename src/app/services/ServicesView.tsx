@@ -5,7 +5,13 @@ import { ServiceCard } from "@/components/services/ServiceCard";
 import { OrderModal } from "@/components/services/OrderModal";
 import type { CatalogCategory, CatalogService } from "@/lib/types/catalog";
 
-export function ServicesView({ categories }: { categories: CatalogCategory[] }) {
+export function ServicesView({
+  categories,
+  discountPercent,
+}: {
+  categories: CatalogCategory[];
+  discountPercent: number;
+}) {
   const [query, setQuery] = useState("");
   const [platform, setPlatform] = useState<string>("All");
   const [serviceType, setServiceType] = useState<string>("All");
@@ -154,6 +160,7 @@ export function ServicesView({ categories }: { categories: CatalogCategory[] }) 
       {orderingService && (
         <OrderModal
           service={orderingService}
+          discountPercent={discountPercent}
           onClose={() => setOrderingService(null)}
         />
       )}
