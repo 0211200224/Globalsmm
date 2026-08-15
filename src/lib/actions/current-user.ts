@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { generateUniqueReferralCode, linkReferral } from "@/lib/actions/affiliate";
@@ -18,8 +19,16 @@ import { generateUniqueReferralCode, linkReferral } from "@/lib/actions/affiliat
  * was stashed in Supabase's `user_metadata.referredByCode` at signUp time
  * (see src/app/register/page.tsx) and gets resolved here, once, when the
  * Prisma row is first created.
+ *
+ * Wrapped in React's `cache()` because nearly every page.tsx calls this
+ * directly AND renders it a second time via AppShell/AdminShell — without
+ * memoization that's 2x the Supabase + Prisma round trips on every single
+ * protected page load, which stacks with everything else a page fetches and
+ * risks tripping a serverless function's execution timeout. `cache()`
+ * de-dupes repeat calls within the same request automatically, no call
+ * sites need to change.
  */
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async function getCurrentUser() {
   const supabase = await createClient();
   const {
     data: { user: authUser },
@@ -72,4 +81,4 @@ export async function getCurrentUser() {
   }
 
   return user;
-}
+});

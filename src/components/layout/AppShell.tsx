@@ -28,7 +28,7 @@ export async function AppShell({ children }: AppShellProps) {
 
   const userName = user?.name || user?.email || "Account";
   const userRole = user ? formatRole(user.role, user.tier) : "Member";
-  const { notifications, unreadCount } = await getMyNotifications();
+  const { notifications, unreadCount } = await getMyNotifications(user?.id);
 
   return (
     <div className="min-h-screen">

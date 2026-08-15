@@ -38,17 +38,22 @@ async function getRequester() {
   return prisma.user.findUnique({ where: { supabaseId: authUser.id } });
 }
 
-export async function getMyNotifications() {
-  const user = await getRequester();
-  if (!user) return { notifications: [], unreadCount: 0 };
+/**
+ * Accepts an already-known userId (AppShell/AdminShell already called the
+ * cached getCurrentUser()) to skip a redundant Supabase + Prisma user
+ * lookup. Falls back to resolving it from the session when omitted.
+ */
+export async function getMyNotifications(userId?: string) {
+  const resolvedUserId = userId ?? (await getRequester())?.id;
+  if (!resolvedUserId) return { notifications: [], unreadCount: 0 };
 
   const [notifications, unreadCount] = await Promise.all([
     prisma.notification.findMany({
-      where: { userId: user.id },
+      where: { userId: resolvedUserId },
       orderBy: { createdAt: "desc" },
       take: 20,
     }),
-    prisma.notification.count({ where: { userId: user.id, read: false } }),
+    prisma.notification.count({ where: { userId: resolvedUserId, read: false } }),
   ]);
 
   return {

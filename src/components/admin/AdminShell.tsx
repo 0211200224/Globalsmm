@@ -12,7 +12,7 @@ type AdminShellProps = {
 
 export async function AdminShell({ children }: AdminShellProps) {
   const user = await getCurrentUser();
-  const { notifications, unreadCount } = await getMyNotifications();
+  const { notifications, unreadCount } = await getMyNotifications(user?.id);
 
   return (
     <div className="min-h-screen">
