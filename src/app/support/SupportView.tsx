@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { TicketStatusBadge } from "@/components/support/TicketStatusBadge";
 import { NewTicketModal } from "@/components/support/NewTicketModal";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 import type { TicketListRow } from "@/lib/types/support";
 
 export function SupportView({
@@ -14,6 +15,7 @@ export function SupportView({
   tickets: TicketListRow[];
   orders: { id: string; label: string }[];
 }) {
+  const t = useTranslations().support;
   const [showNew, setShowNew] = useState(false);
 
   const columns: DataTableColumn<TicketListRow>[] = [
@@ -45,7 +47,7 @@ export function SupportView({
           href={`/support/${row.id}`}
           className="text-primary text-label-sm font-bold hover:underline"
         >
-          View →
+          {t.view} →
         </Link>
       ),
     },
@@ -55,9 +57,9 @@ export function SupportView({
     <>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-gutter">
         <div>
-          <h2 className="text-headline-lg text-on-surface">Support</h2>
+          <h2 className="text-headline-lg text-on-surface">{t.title}</h2>
           <p className="text-body-md text-on-surface-variant mt-1">
-            Need help with an order or your account? Open a ticket and we&apos;ll get back to you.
+            {t.subtitle}
           </p>
         </div>
         <button
@@ -66,7 +68,7 @@ export function SupportView({
           className="px-6 py-2.5 rounded-lg bg-primary text-on-primary font-bold flex items-center gap-2 hover:brightness-110 active:scale-95 transition-all w-fit"
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
-          New Ticket
+          {t.newTicket}
         </button>
       </div>
 
@@ -75,7 +77,7 @@ export function SupportView({
         columns={columns}
         rows={tickets}
         rowKey={(row) => row.id}
-        emptyMessage="You haven't opened any support tickets yet."
+        emptyMessage={t.noTicketsYet}
       />
 
       {showNew && <NewTicketModal orders={orders} onClose={() => setShowNew(false)} />}

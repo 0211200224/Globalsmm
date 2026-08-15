@@ -4,47 +4,49 @@ import { useState } from "react";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { TransactionStatusBadge } from "@/components/wallet/TransactionStatusBadge";
 import { mockTransactions, paymentMethods, type MockTransaction } from "./data";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 const presetAmounts = [50, 100, 500];
 
-const columns: DataTableColumn<MockTransaction>[] = [
-  {
-    header: "Transaction ID",
-    render: (row) => (
-      <span className="font-mono text-sm text-on-surface-variant">
-        {row.txId}
-      </span>
-    ),
-  },
-  { header: "Date", render: (row) => row.date },
-  {
-    header: "Method",
-    render: (row) => (
-      <div className="flex items-center gap-2">
-        <span className={`material-symbols-outlined text-lg ${row.iconColorClass}`}>
-          {row.icon}
-        </span>
-        <span>{row.method}</span>
-      </div>
-    ),
-  },
-  {
-    header: "Amount",
-    render: (row) => (
-      <span className="font-mono font-bold text-on-surface">
-        {row.amount}
-      </span>
-    ),
-  },
-  {
-    header: "Status",
-    render: (row) => <TransactionStatusBadge status={row.status} />,
-  },
-];
-
 export function WalletView({ balance }: { balance: string }) {
+  const t = useTranslations().wallet;
   const [amount, setAmount] = useState("");
   const [selectedMethod, setSelectedMethod] = useState("stripe");
+
+  const columns: DataTableColumn<MockTransaction>[] = [
+    {
+      header: "Transaction ID",
+      render: (row) => (
+        <span className="font-mono text-sm text-on-surface-variant">
+          {row.txId}
+        </span>
+      ),
+    },
+    { header: "Date", render: (row) => row.date },
+    {
+      header: "Method",
+      render: (row) => (
+        <div className="flex items-center gap-2">
+          <span className={`material-symbols-outlined text-lg ${row.iconColorClass}`}>
+            {row.icon}
+          </span>
+          <span>{row.method}</span>
+        </div>
+      ),
+    },
+    {
+      header: "Amount",
+      render: (row) => (
+        <span className="font-mono font-bold text-on-surface">
+          {row.amount}
+        </span>
+      ),
+    },
+    {
+      header: "Status",
+      render: (row) => <TransactionStatusBadge status={row.status} />,
+    },
+  ];
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,11 +59,10 @@ export function WalletView({ balance }: { balance: string }) {
     <>
       <div>
         <h2 className="text-headline-lg text-on-background">
-          Wallet &amp; Deposits
+          {t.title}
         </h2>
         <p className="text-body-md text-on-surface-variant">
-          Manage your funds and deposit history with enterprise-grade
-          security.
+          {t.subtitle}
         </p>
       </div>
 
@@ -77,12 +78,12 @@ export function WalletView({ balance }: { balance: string }) {
                 <div className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
                   <span className="text-label-sm text-white flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />{" "}
-                    Verified Account
+                    {t.verifiedAccount}
                   </span>
                 </div>
               </div>
               <p className="text-label-md text-primary/70 uppercase tracking-[0.2em] mb-2">
-                Available Balance
+                {t.availableBalance}
               </p>
               <div className="flex items-baseline gap-2">
                 <span className="text-display-xl text-white font-mono">
@@ -99,12 +100,12 @@ export function WalletView({ balance }: { balance: string }) {
               <span className="material-symbols-outlined text-secondary">
                 add_circle
               </span>
-              Add Funds
+              {t.addFunds}
             </h3>
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-label-md text-on-surface-variant mb-2">
-                  Amount to Add (USD)
+                  {t.amountToAdd}
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-mono font-bold">
@@ -141,7 +142,7 @@ export function WalletView({ balance }: { balance: string }) {
                 type="submit"
                 className="w-full py-4 bg-gradient-to-r from-secondary-container to-secondary/80 text-white font-bold rounded-lg shadow-lg shadow-secondary/10 hover:shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <span>Proceed to Payment</span>
+                <span>{t.proceedToPayment}</span>
                 <span className="material-symbols-outlined">
                   arrow_forward
                 </span>
@@ -150,7 +151,7 @@ export function WalletView({ balance }: { balance: string }) {
                 <span className="material-symbols-outlined text-sm">
                   lock
                 </span>
-                Secure encrypted transaction
+                {t.secureTransaction}
               </p>
             </form>
           </div>
@@ -160,7 +161,7 @@ export function WalletView({ balance }: { balance: string }) {
         <div className="lg:col-span-5 space-y-gutter">
           <div className="bg-surface-container-low border border-white/5 rounded-xl p-stack-lg shadow-sm h-full">
             <h3 className="text-headline-md text-on-surface mb-stack-md">
-              Payment Methods
+              {t.paymentMethods}
             </h3>
             <div className="space-y-3">
               {paymentMethods.map((method) => {
@@ -210,9 +211,8 @@ export function WalletView({ balance }: { balance: string }) {
             </div>
             <div className="mt-8 p-4 rounded-xl bg-primary-container border border-primary/10">
               <p className="text-label-sm text-on-primary-container leading-relaxed">
-                <span className="font-bold text-primary">Note:</span>{" "}
-                Processing fees vary per method. Additional payment methods
-                are rolling out after launch.
+                <span className="font-bold text-primary">{t.paymentNote}</span>{" "}
+                {t.paymentNoteBody}
               </p>
             </div>
           </div>
@@ -221,7 +221,7 @@ export function WalletView({ balance }: { balance: string }) {
         {/* Full Width: Transaction History */}
         <div className="lg:col-span-12">
           <DataTable
-            title="Transaction History"
+            title={t.transactionHistory}
             action={
               <div className="flex gap-2">
                 <button
@@ -231,7 +231,7 @@ export function WalletView({ balance }: { balance: string }) {
                   <span className="material-symbols-outlined text-sm">
                     filter_list
                   </span>
-                  Filter
+                  {t.filter}
                 </button>
                 <button
                   type="button"
@@ -240,7 +240,7 @@ export function WalletView({ balance }: { balance: string }) {
                   <span className="material-symbols-outlined text-sm">
                     download
                   </span>
-                  Export
+                  {t.export}
                 </button>
               </div>
             }

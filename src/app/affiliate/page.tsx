@@ -7,6 +7,8 @@ import { WithdrawPanel } from "@/components/affiliate/WithdrawPanel";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { getAffiliateSummary } from "@/lib/actions/affiliate";
 import { formatUSD } from "@/lib/format";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { formatMessage } from "@/lib/i18n/I18nProvider";
 
 type HistoryRow = {
   id: string;
@@ -47,6 +49,7 @@ const columns: DataTableColumn<HistoryRow>[] = [
 ];
 
 export default async function AffiliatePage() {
+  const { affiliate: t } = await getDictionary();
   const user = await getCurrentUser();
   const summary = user ? await getAffiliateSummary(user.id) : null;
 
@@ -74,12 +77,12 @@ export default async function AffiliatePage() {
       <section className="flex flex-col md:flex-row justify-between items-end gap-stack-lg">
         <div>
           <h2 className="text-headline-lg text-on-surface">
-            Ambassador Performance
+            {t.title}
           </h2>
           <p className="text-body-md text-on-surface-variant mt-2 max-w-2xl">
-            Earn {summary ? `${(summary.commissionRate * 100).toFixed(0)}%` : "5%"}{" "}
-            commission on every qualifying order placed by people you refer —
-            not just their first purchase.
+            {formatMessage(t.subtitle, {
+              rate: summary ? (summary.commissionRate * 100).toFixed(0) : "5",
+            })}
           </p>
         </div>
       </section>
@@ -91,17 +94,17 @@ export default async function AffiliatePage() {
           <div className="flex justify-between items-start mb-8">
             <div>
               <span className="text-primary text-label-sm uppercase tracking-widest bg-primary/10 px-3 py-1 rounded-full">
-                Active Campaign
+                {t.activeCampaign}
               </span>
               <h3 className="text-headline-md text-on-surface mt-4">
-                Your Referral Link
+                {t.yourReferralLink}
               </h3>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-stack-lg">
-            <CopyField label="Unique Referral URL" value={referralUrl} />
+            <CopyField label={t.referralUrl} value={referralUrl} />
             <CopyField
-              label="Referral Code"
+              label={t.referralCode}
               value={summary?.referralCode ?? ""}
               monospace
             />
@@ -116,18 +119,18 @@ export default async function AffiliatePage() {
                 payments
               </span>
               <span className="text-label-sm bg-white/10 px-3 py-1 rounded-full backdrop-blur-md">
-                Available for Payout
+                {t.availableForPayout}
               </span>
             </div>
             <div className="mt-8">
               <p className="text-label-md text-on-surface/70">
-                Available Commission
+                {t.availableCommission}
               </p>
               <h4 className="text-display-xl text-on-surface mt-1">
                 {formatUSD(summary?.available ?? 0)}
               </h4>
               <p className="text-label-sm text-on-surface/50 mt-2">
-                + {formatUSD(summary?.pending ?? 0)} pending
+                + {formatUSD(summary?.pending ?? 0)} {t.pendingSuffix}
               </p>
             </div>
           </div>
@@ -140,7 +143,7 @@ export default async function AffiliatePage() {
         <div className="glass-panel p-stack-md rounded-xl">
           <div className="flex items-center justify-between">
             <span className="text-on-surface-variant text-label-md">
-              Total Referrals
+              {t.totalReferrals}
             </span>
             <span className="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-lg">
               group_add
@@ -153,7 +156,7 @@ export default async function AffiliatePage() {
         <div className="glass-panel p-stack-md rounded-xl">
           <div className="flex items-center justify-between">
             <span className="text-on-surface-variant text-label-md">
-              Active Referrals
+              {t.activeReferrals}
             </span>
             <span className="material-symbols-outlined text-tertiary bg-tertiary/10 p-1.5 rounded-lg">
               bolt
@@ -166,7 +169,7 @@ export default async function AffiliatePage() {
         <div className="glass-panel p-stack-md rounded-xl">
           <div className="flex items-center justify-between">
             <span className="text-on-surface-variant text-label-md">
-              Pending Earnings
+              {t.pendingEarnings}
             </span>
             <span className="material-symbols-outlined text-secondary bg-secondary/10 p-1.5 rounded-lg">
               hourglass_top
@@ -179,7 +182,7 @@ export default async function AffiliatePage() {
         <div className="glass-panel p-stack-md rounded-xl">
           <div className="flex items-center justify-between">
             <span className="text-on-surface-variant text-label-md">
-              Total Paid Out
+              {t.totalPaidOut}
             </span>
             <span className="material-symbols-outlined text-on-tertiary-container bg-tertiary-container p-1.5 rounded-lg">
               monetization_on
@@ -192,11 +195,11 @@ export default async function AffiliatePage() {
       </div>
 
       <DataTable
-        title="Referral History"
+        title={t.referralHistory}
         columns={columns}
         rows={history}
         rowKey={(row) => row.id}
-        emptyMessage="No referral commissions yet — share your link to start earning."
+        emptyMessage={t.noCommissions}
       />
     </AppShell>
   );

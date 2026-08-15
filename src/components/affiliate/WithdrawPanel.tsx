@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { requestWithdrawalAction } from "@/lib/actions/withdraw";
 import { formatUSD } from "@/lib/format";
 import { MIN_WITHDRAWAL_USD } from "@/lib/constants";
+import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
 
 export function WithdrawPanel({ available }: { available: number }) {
   const router = useRouter();
+  const t = useTranslations().affiliate;
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(String(Math.min(available, MIN_WITHDRAWAL_USD)));
   const [loading, setLoading] = useState(false);
@@ -38,7 +40,7 @@ export function WithdrawPanel({ available }: { available: number }) {
         <form onSubmit={handleSubmit} className="space-y-3">
           {success ? (
             <p className="text-center text-body-sm text-white">
-              Withdrawal requested! Our team will process it shortly.
+              {t.withdrawalRequested}
             </p>
           ) : (
             <>
@@ -55,14 +57,14 @@ export function WithdrawPanel({ available }: { available: number }) {
                 step="0.01"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder={`Min ${formatUSD(MIN_WITHDRAWAL_USD)}`}
+                placeholder={formatMessage(t.minWithdrawal, { amount: formatUSD(MIN_WITHDRAWAL_USD) })}
               />
               <button
                 type="submit"
                 disabled={loading || available < MIN_WITHDRAWAL_USD}
                 className="w-full py-4 bg-white text-secondary-container rounded-xl font-bold text-body-md hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Requesting..." : "Confirm Withdrawal"}
+                {loading ? t.requesting : t.confirmWithdrawal}
               </button>
             </>
           )}
@@ -75,12 +77,12 @@ export function WithdrawPanel({ available }: { available: number }) {
             disabled={available < MIN_WITHDRAWAL_USD}
             className="w-full py-4 bg-white text-secondary-container rounded-xl font-bold text-body-md hover:shadow-lg hover:-translate-y-0.5 transition-all active:translate-y-0 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Withdraw Funds
+            {t.withdrawFunds}
           </button>
           <p className="text-center text-label-sm text-on-surface/40 mt-4">
             {available < MIN_WITHDRAWAL_USD
-              ? `Minimum withdrawal is ${formatUSD(MIN_WITHDRAWAL_USD)}`
-              : "Requests are reviewed and paid out manually."}
+              ? formatMessage(t.minWithdrawal, { amount: formatUSD(MIN_WITHDRAWAL_USD) })
+              : t.withdrawalNote}
           </p>
         </>
       )}

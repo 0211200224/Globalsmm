@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { OrderModal } from "@/components/services/OrderModal";
+import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
 import type { CatalogCategory, CatalogService } from "@/lib/types/catalog";
 
 export function ServicesView({
@@ -12,6 +13,7 @@ export function ServicesView({
   categories: CatalogCategory[];
   discountPercent: number;
 }) {
+  const t = useTranslations().marketplace;
   const [query, setQuery] = useState("");
   const [platform, setPlatform] = useState<string>("All");
   const [serviceType, setServiceType] = useState<string>("All");
@@ -50,10 +52,12 @@ export function ServicesView({
       <section>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-gutter mb-stack-md">
           <div className="flex-1 max-w-2xl">
-            <h1 className="text-headline-lg mb-stack-sm">Marketplace</h1>
+            <h1 className="text-headline-lg mb-stack-sm">{t.title}</h1>
             <p className="text-body-md text-on-surface-variant mb-stack-lg">
-              {allServices.length}+ services across {categories.length}{" "}
-              platforms with enterprise-grade reliability.
+              {formatMessage(t.subtitle, {
+                count: allServices.length,
+                platforms: categories.length,
+              })}
             </p>
             <div className="relative group">
               <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-secondary">
@@ -61,7 +65,7 @@ export function ServicesView({
               </span>
               <input
                 className="w-full bg-surface-container-low border border-outline-variant rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:border-secondary transition-all text-on-surface"
-                placeholder="Search services (e.g. Instagram Followers)..."
+                placeholder={t.searchPlaceholder}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -85,7 +89,7 @@ export function ServicesView({
             }
           >
             <span className="material-symbols-outlined text-[18px]">apps</span>
-            All Platforms
+            {t.allPlatforms}
           </button>
           {categories.map((category) => (
             <button
@@ -121,7 +125,7 @@ export function ServicesView({
                   : "px-4 py-1.5 rounded-full border border-outline-variant/50 text-on-surface-variant hover:text-on-surface text-label-sm whitespace-nowrap transition-all"
               }
             >
-              All Types
+              {t.allTypes}
             </button>
             {typesForPlatform.map((type) => (
               <button
@@ -144,7 +148,7 @@ export function ServicesView({
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
         {results.length === 0 ? (
           <p className="col-span-full text-center text-body-md text-on-surface-variant py-12">
-            No services match your search.
+            {t.noResults}
           </p>
         ) : (
           results.map((service) => (

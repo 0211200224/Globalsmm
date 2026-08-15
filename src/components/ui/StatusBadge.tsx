@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import type { Dictionary } from "@/lib/i18n/dictionary-type";
 import type { OrderRowStatus } from "@/lib/types/orders";
 
 const statusStyles: Record<OrderRowStatus, string> = {
@@ -10,22 +14,23 @@ const statusStyles: Record<OrderRowStatus, string> = {
   REFUNDED: "bg-error-container/20 text-error",
 };
 
-const statusLabels: Record<OrderRowStatus, string> = {
-  PENDING: "Pending",
-  PROCESSING: "Processing",
-  IN_PROGRESS: "In Progress",
-  COMPLETED: "Completed",
-  PARTIAL: "Partial",
-  CANCELED: "Canceled",
-  REFUNDED: "Refunded",
+const statusLabelKeys: Record<OrderRowStatus, keyof Dictionary["orders"]> = {
+  PENDING: "statusPending",
+  PROCESSING: "statusProcessing",
+  IN_PROGRESS: "statusInProgress",
+  COMPLETED: "statusCompleted",
+  PARTIAL: "statusPartial",
+  CANCELED: "statusCanceled",
+  REFUNDED: "statusRefunded",
 };
 
 export function StatusBadge({ status }: { status: OrderRowStatus }) {
+  const t = useTranslations().orders;
   return (
     <span
       className={`px-3 py-1 rounded-full text-[11px] font-bold ${statusStyles[status]}`}
     >
-      {statusLabels[status]}
+      {t[statusLabelKeys[status]]}
     </span>
   );
 }

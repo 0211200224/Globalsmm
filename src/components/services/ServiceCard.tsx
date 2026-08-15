@@ -1,5 +1,8 @@
+"use client";
+
 import type { CatalogService } from "@/lib/types/catalog";
 import { ServiceQualityStats } from "./ServiceQualityStats";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 const badgeStyles: Record<string, string> = {
   Hot: "bg-tertiary-container text-on-tertiary-container",
@@ -14,6 +17,8 @@ export function ServiceCard({
   service: CatalogService;
   onOrder: (service: CatalogService) => void;
 }) {
+  const t = useTranslations().marketplace;
+
   return (
     <div className="glass-card p-6 rounded-xl flex flex-col justify-between group hover:shadow-xl hover:border-secondary/20 transition-all duration-300">
       <div>
@@ -42,7 +47,7 @@ export function ServiceCard({
       <div className="space-y-4">
         <div className="flex flex-col">
           <span className="text-[10px] text-outline uppercase tracking-wider font-bold">
-            Price / 1k
+            {t.pricePer1k}
           </span>
           <span className="text-headline-md text-secondary">
             {service.pricePer1000}
@@ -50,15 +55,15 @@ export function ServiceCard({
         </div>
         <ServiceQualityStats service={service} />
         <div className="flex items-center justify-between text-[11px] text-on-surface-variant">
-          <span>Min: {service.minQuantity.toLocaleString("en-US")}</span>
-          <span>Max: {service.maxQuantity.toLocaleString("en-US")}</span>
+          <span>{t.min}: {service.minQuantity.toLocaleString("en-US")}</span>
+          <span>{t.max}: {service.maxQuantity.toLocaleString("en-US")}</span>
         </div>
         <button
           type="button"
           onClick={() => onOrder(service)}
           className="w-full py-3 rounded-lg border border-outline-variant text-on-surface text-label-md hover:bg-surface-container-high active:scale-[0.98] transition-all"
         >
-          Order Now
+          {t.orderNow}
         </button>
       </div>
     </div>

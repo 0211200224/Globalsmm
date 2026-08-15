@@ -6,6 +6,7 @@ import { createOrder } from "@/lib/actions/orders";
 import { formatUSD } from "@/lib/format";
 import type { CatalogService } from "@/lib/types/catalog";
 import { ServiceQualityStats } from "./ServiceQualityStats";
+import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
 
 export function OrderModal({
   service,
@@ -17,6 +18,7 @@ export function OrderModal({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations().orderModal;
   const [targetLink, setTargetLink] = useState("");
   const [quantity, setQuantity] = useState(service.minQuantity);
   const [loading, setLoading] = useState(false);
@@ -55,13 +57,13 @@ export function OrderModal({
             <span className="material-symbols-outlined text-secondary text-5xl">
               check_circle
             </span>
-            <h3 className="text-headline-md text-on-surface">Order placed!</h3>
+            <h3 className="text-headline-md text-on-surface">{t.orderPlaced}</h3>
             <p className="text-body-md text-on-surface-variant">
-              Your order ID is{" "}
+              {t.orderIdIs}{" "}
               <span className="font-mono font-bold text-on-surface">
                 #GS-{90000 + successOrderNumber}
               </span>
-              . You can track its status in Orders.
+              . {t.trackStatus}
             </p>
             <div className="flex gap-3 justify-center pt-2">
               <button
@@ -69,14 +71,14 @@ export function OrderModal({
                 onClick={onClose}
                 className="px-6 py-3 rounded-lg border border-outline-variant text-on-surface hover:bg-surface-container-high transition-all"
               >
-                Keep Browsing
+                {t.keepBrowsing}
               </button>
               <button
                 type="button"
                 onClick={() => router.push("/orders")}
                 className="px-6 py-3 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110 transition-all"
               >
-                View Orders
+                {t.viewOrders}
               </button>
             </div>
           </div>
@@ -93,7 +95,7 @@ export function OrderModal({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close"
+                aria-label={t.close}
                 className="p-2 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container-high transition-all"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -111,11 +113,11 @@ export function OrderModal({
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label className="block text-label-md text-on-surface-variant mb-2">
-                  Link or Username
+                  {t.linkOrUsername}
                 </label>
                 <input
                   className="w-full bg-surface-container border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg py-3 px-4 text-on-surface transition-all outline-none"
-                  placeholder="https://instagram.com/youraccount"
+                  placeholder={t.linkPlaceholder}
                   type="text"
                   required
                   value={targetLink}
@@ -126,11 +128,13 @@ export function OrderModal({
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-label-md text-on-surface-variant">
-                    Quantity
+                    {t.quantity}
                   </label>
                   <span className="text-label-sm text-on-surface-variant">
-                    Min {service.minQuantity.toLocaleString("en-US")} · Max{" "}
-                    {service.maxQuantity.toLocaleString("en-US")}
+                    {formatMessage(t.quantityRange, {
+                      min: service.minQuantity.toLocaleString("en-US"),
+                      max: service.maxQuantity.toLocaleString("en-US"),
+                    })}
                   </span>
                 </div>
                 <input
@@ -144,18 +148,20 @@ export function OrderModal({
                 />
                 {(quantity < service.minQuantity || quantity > service.maxQuantity) && (
                   <p className="text-label-sm text-error mt-2">
-                    Quantity must be between {service.minQuantity.toLocaleString("en-US")} and{" "}
-                    {service.maxQuantity.toLocaleString("en-US")}.
+                    {formatMessage(t.quantityError, {
+                      min: service.minQuantity.toLocaleString("en-US"),
+                      max: service.maxQuantity.toLocaleString("en-US"),
+                    })}
                   </p>
                 )}
               </div>
 
               <div className="flex items-center justify-between py-4 border-y border-white/5">
                 <div>
-                  <span className="text-label-md text-on-surface-variant">Total Price</span>
+                  <span className="text-label-md text-on-surface-variant">{t.totalPrice}</span>
                   {discountPercent > 0 && (
                     <p className="text-label-sm text-tertiary font-medium">
-                      {discountPercent}% tier discount applied
+                      {formatMessage(t.discountApplied, { percent: discountPercent })}
                     </p>
                   )}
                 </div>
@@ -180,7 +186,7 @@ export function OrderModal({
                 }
                 className="w-full py-4 bg-primary text-on-primary font-bold rounded-lg hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {loading ? "Placing order..." : "Place Order"}
+                {loading ? t.placingOrder : t.placeOrder}
               </button>
             </form>
           </>

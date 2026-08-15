@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { replyToTicket, setTicketStatus } from "@/lib/actions/support";
 import { TicketStatusBadge } from "./TicketStatusBadge";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 import type { TicketDetailData, TicketStatus } from "@/lib/types/support";
 
 const adminStatusOptions: TicketStatus[] = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"];
@@ -18,6 +19,7 @@ export function TicketThread({
   backHref: string;
 }) {
   const router = useRouter();
+  const t = useTranslations().support;
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +96,7 @@ export function TicketThread({
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-label-sm font-bold text-on-surface">
-                  {msg.isAdminReply ? "Support Team" : msg.authorName}
+                  {msg.isAdminReply ? t.supportTeam : msg.authorName}
                 </span>
                 <span className="text-label-sm text-on-surface-variant">
                   {msg.createdAtLabel}
@@ -116,7 +118,7 @@ export function TicketThread({
           <textarea
             className="w-full bg-surface-container border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg py-3 px-4 text-on-surface outline-none transition-all"
             rows={3}
-            placeholder="Write a reply..."
+            placeholder={t.writeReply}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
@@ -126,7 +128,7 @@ export function TicketThread({
             disabled={loading}
             className="px-6 py-3 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110 active:scale-95 transition-all disabled:opacity-60"
           >
-            {loading ? "Sending..." : "Send Reply"}
+            {loading ? t.sending : t.sendReply}
           </button>
         </form>
       )}

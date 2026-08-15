@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cancelMyOrder, requestRefill } from "@/lib/actions/orders";
+import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
+import type { Dictionary } from "@/lib/i18n/dictionary-type";
 import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
 
-const statusConfig: Record<
+const statusStyles: Record<
   OrderRowStatus,
   {
-    label: string;
+    labelKey: keyof Dictionary["orders"];
     badgeClass: string;
     barClass: string;
     valueClass: string;
@@ -18,14 +20,14 @@ const statusConfig: Record<
   }
 > = {
   PENDING: {
-    label: "Pending",
+    labelKey: "statusPending",
     badgeClass: "bg-surface-container-highest border-white/10 text-on-surface-variant",
     barClass: "bg-secondary/30",
     valueClass: "text-on-surface-variant",
     labelClass: "text-on-surface-variant",
   },
   PROCESSING: {
-    label: "Processing",
+    labelKey: "statusProcessing",
     badgeClass:
       "bg-secondary-container/30 border-secondary-container text-on-secondary-container",
     barClass: "bg-secondary",
@@ -34,7 +36,7 @@ const statusConfig: Record<
     dot: true,
   },
   IN_PROGRESS: {
-    label: "In Progress",
+    labelKey: "statusInProgress",
     badgeClass: "bg-primary/10 border-primary/30 text-primary",
     barClass: "bg-primary",
     valueClass: "text-primary",
@@ -42,7 +44,7 @@ const statusConfig: Record<
     dot: true,
   },
   COMPLETED: {
-    label: "Completed",
+    labelKey: "statusCompleted",
     badgeClass: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
     barClass: "bg-emerald-500",
     valueClass: "text-emerald-400",
@@ -50,21 +52,21 @@ const statusConfig: Record<
     icon: "check_circle",
   },
   PARTIAL: {
-    label: "Partial",
+    labelKey: "statusPartial",
     badgeClass: "bg-tertiary-container border-tertiary/30 text-tertiary",
     barClass: "bg-tertiary",
     valueClass: "text-tertiary",
     labelClass: "text-tertiary",
   },
   CANCELED: {
-    label: "Canceled",
+    labelKey: "statusCanceled",
     badgeClass: "bg-surface-container-highest border-white/10 text-outline",
     barClass: "bg-outline/40",
     valueClass: "text-outline",
     labelClass: "text-outline",
   },
   REFUNDED: {
-    label: "Refunded",
+    labelKey: "statusRefunded",
     badgeClass: "bg-error/10 border-error/30 text-error",
     barClass: "bg-error/60",
     valueClass: "text-error",
@@ -75,7 +77,8 @@ const statusConfig: Record<
 
 export function OrderRow({ order }: { order: OrderRowData }) {
   const router = useRouter();
-  const config = statusConfig[order.status];
+  const t = useTranslations().orders;
+  const config = statusStyles[order.status];
   const progressPercent =
     order.quantity > 0
       ? Math.min(100, Math.round((order.deliveredQuantity / order.quantity) * 100))
@@ -85,7 +88,7 @@ export function OrderRow({ order }: { order: OrderRowData }) {
   const [error, setError] = useState<string | null>(null);
 
   async function handleCancel() {
-    if (!confirm("Cancel this order? The amount will be refunded to your wallet.")) return;
+    if (!confirm(t.cancelConfirm)) return;
     setError(null);
     setLoading("cancel");
     const result = await cancelMyOrder(order.id);
@@ -121,14 +124,14 @@ export function OrderRow({ order }: { order: OrderRowData }) {
           <div>
             <h4 className="text-label-md text-on-surface">{order.serviceName}</h4>
             <p className="text-body-sm text-on-surface-variant">
-              Order {order.orderCode} · {order.createdAtLabel}
+              {t.orderLabel} {order.orderCode} · {order.createdAtLabel}
             </p>
           </div>
         </div>
 
         <div className="flex-1 space-y-2">
           <div className="flex justify-between items-end mb-1">
-            <span className={`text-label-sm ${config.labelClass}`}>Progress</span>
+            <span className={`text-label-sm ${config.labelClass}`}>{t.progress}</span>
             <span className={`text-label-md font-bold ${config.valueClass}`}>
               {order.deliveredQuantity.toLocaleString("en-US")} /{" "}
               {order.quantity.toLocaleString("en-US")}
@@ -144,7 +147,7 @@ export function OrderRow({ order }: { order: OrderRowData }) {
 
         <div className="flex items-center justify-between md:justify-end gap-6 md:w-1/4">
           <div className="text-right hidden sm:block">
-            <p className="text-label-sm text-on-surface-variant">Charged</p>
+            <p className="text-label-sm text-on-surface-variant">{t.charged}</p>
             <p className="text-label-md text-on-surface">{order.chargedAmount}</p>
           </div>
           <div
@@ -158,7 +161,7 @@ export function OrderRow({ order }: { order: OrderRowData }) {
                 {config.icon}
               </span>
             )}
-            {config.label}
+            {t[config.labelKey]}
           </div>
         </div>
       </div>
@@ -178,7 +181,7 @@ export function OrderRow({ order }: { order: OrderRowData }) {
                 disabled={loading !== null}
                 className="px-4 py-2 rounded-lg border border-error/30 text-error hover:bg-error/10 text-label-sm transition-colors disabled:opacity-50"
               >
-                {loading === "cancel" ? "Canceling..." : "Cancel order"}
+                {loading === "cancel" ? t.canceling : t.cancelOrder}
               </button>
             )}
             {order.canRefill && (
@@ -192,8 +195,8 @@ export function OrderRow({ order }: { order: OrderRowData }) {
                   autorenew
                 </span>
                 {loading === "refill"
-                  ? "Requesting..."
-                  : `Request refill (${order.refillDays}d guarantee)`}
+                  ? t.requestingRefill
+                  : formatMessage(t.requestRefill, { days: order.refillDays ?? 0 })}
               </button>
             )}
           </div>

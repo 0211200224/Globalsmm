@@ -1,4 +1,7 @@
+"use client";
+
 import type { CatalogService } from "@/lib/types/catalog";
+import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
 
 type Props = {
   service: Pick<CatalogService, "qualityScore" | "retentionPercent" | "refillDays" | "speedLabel">;
@@ -12,19 +15,23 @@ type Props = {
  * rated yet just shows fewer tiles instead of a fake number.
  */
 export function ServiceQualityStats({ service }: Props) {
+  const t = useTranslations().marketplace;
   const stats: { icon: string; label: string; value: string }[] = [];
 
   if (service.qualityScore != null) {
-    stats.push({ icon: "star", label: "Quality", value: `${service.qualityScore.toFixed(1)}/10` });
+    stats.push({ icon: "star", label: t.quality, value: `${service.qualityScore.toFixed(1)}/10` });
   }
-  stats.push({ icon: "bolt", label: "Avg. Start", value: service.speedLabel });
+  stats.push({ icon: "bolt", label: t.avgStart, value: service.speedLabel });
   if (service.retentionPercent != null) {
-    stats.push({ icon: "trending_up", label: "Retention", value: `${service.retentionPercent}%` });
+    stats.push({ icon: "trending_up", label: t.retention, value: `${service.retentionPercent}%` });
   }
   stats.push({
     icon: "autorenew",
-    label: "Refill",
-    value: service.refillDays > 0 ? `${service.refillDays} days` : "None",
+    label: t.refill,
+    value:
+      service.refillDays > 0
+        ? formatMessage(t.refillDaysValue, { days: service.refillDays })
+        : t.refillNone,
   });
 
   return (

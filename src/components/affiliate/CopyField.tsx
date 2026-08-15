@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 type CopyFieldProps = {
   label: string;
@@ -9,6 +10,7 @@ type CopyFieldProps = {
 };
 
 export function CopyField({ label, value, monospace }: CopyFieldProps) {
+  const t = useTranslations().affiliate;
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -44,7 +46,7 @@ export function CopyField({ label, value, monospace }: CopyFieldProps) {
           </span>
           {copied && (
             <span className="absolute -top-9 right-0 bg-on-surface text-inverse-on-surface text-label-sm px-2 py-1 rounded-md whitespace-nowrap">
-              Copied!
+              {t.copied}
             </span>
           )}
         </button>

@@ -3,15 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { OrderRow } from "@/components/orders/OrderRow";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
-
-const tabs: Array<{ label: string; statuses: OrderRowStatus[] | "all" }> = [
-  { label: "All Orders", statuses: "all" },
-  { label: "Active", statuses: ["PENDING", "PROCESSING", "IN_PROGRESS"] },
-  { label: "Completed", statuses: ["COMPLETED"] },
-  { label: "Partial", statuses: ["PARTIAL"] },
-  { label: "Canceled / Refunded", statuses: ["CANCELED", "REFUNDED"] },
-];
 
 type Stats = {
   total: number;
@@ -27,6 +20,14 @@ export function OrdersView({
   orders: OrderRowData[];
   stats: Stats;
 }) {
+  const t = useTranslations().orders;
+  const tabs: Array<{ label: string; statuses: OrderRowStatus[] | "all" }> = [
+    { label: t.tabAll, statuses: "all" },
+    { label: t.tabActive, statuses: ["PENDING", "PROCESSING", "IN_PROGRESS"] },
+    { label: t.tabCompleted, statuses: ["COMPLETED"] },
+    { label: t.tabPartial, statuses: ["PARTIAL"] },
+    { label: t.tabCanceled, statuses: ["CANCELED", "REFUNDED"] },
+  ];
   const [activeTab, setActiveTab] = useState(0);
   const [query, setQuery] = useState("");
 
@@ -52,7 +53,7 @@ export function OrdersView({
             </span>
           </div>
           <p className="text-label-sm text-on-surface-variant mb-1">
-            Total Orders
+            {t.totalOrders}
           </p>
           <h3 className="text-headline-lg text-on-surface">{stats.total}</h3>
         </div>
@@ -61,7 +62,7 @@ export function OrdersView({
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span className="material-symbols-outlined text-6xl">sync</span>
           </div>
-          <p className="text-label-sm text-on-surface-variant mb-1">Active</p>
+          <p className="text-label-sm text-on-surface-variant mb-1">{t.active}</p>
           <h3 className="text-headline-lg text-on-surface">{stats.active}</h3>
         </div>
 
@@ -72,14 +73,14 @@ export function OrdersView({
             </span>
           </div>
           <p className="text-label-sm text-on-surface-variant mb-1">
-            Completed
+            {t.completed}
           </p>
           <h3 className="text-headline-lg text-on-surface">{stats.completed}</h3>
         </div>
 
         <div className="bg-secondary-container border border-white/5 p-6 rounded-xl shadow-lg relative overflow-hidden">
           <p className="text-label-sm text-on-secondary-container mb-1 opacity-80">
-            Total Spending
+            {t.totalSpending}
           </p>
           <h3 className="text-headline-lg text-on-secondary-container">
             {stats.totalSpending}
@@ -110,7 +111,7 @@ export function OrdersView({
             </span>
             <input
               className="bg-transparent border-none focus:ring-0 text-body-sm text-on-surface placeholder:text-on-surface-variant/50 w-32 md:w-48"
-              placeholder="Search Order ID or service..."
+              placeholder={t.searchPlaceholder}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -121,9 +122,7 @@ export function OrdersView({
         <div className="p-6 space-y-4">
           {filtered.length === 0 ? (
             <p className="text-center text-body-md text-on-surface-variant py-12">
-              {orders.length === 0
-                ? "You haven't placed any orders yet."
-                : "No orders match this filter."}
+              {orders.length === 0 ? t.noOrdersAtAll : t.noOrdersFilter}
             </p>
           ) : (
             filtered.map((order) => <OrderRow key={order.id} order={order} />)
@@ -139,7 +138,7 @@ export function OrdersView({
           add
         </span>
         <span className="absolute right-full mr-4 bg-surface-container-high border border-white/10 text-on-surface px-3 py-1.5 rounded-lg text-label-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 pointer-events-none">
-          New Order
+          {t.newOrder}
         </span>
       </Link>
     </>
