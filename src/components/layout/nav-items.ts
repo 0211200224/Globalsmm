@@ -1,17 +1,19 @@
+import type { Dictionary } from "@/lib/i18n/dictionary-type";
+
 export type NavItem = {
   href: string;
-  label: string;
+  labelKey: keyof Dictionary["nav"];
   icon: string;
 };
 
 export const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/services", label: "Marketplace", icon: "storefront" },
-  { href: "/orders", label: "Orders", icon: "shopping_cart" },
-  { href: "/wallet", label: "Wallet", icon: "account_balance_wallet" },
-  { href: "/affiliate", label: "Affiliate", icon: "groups" },
-  { href: "/api", label: "API", icon: "code" },
-  { href: "/support", label: "Support", icon: "support_agent" },
+  { href: "/dashboard", labelKey: "dashboard", icon: "dashboard" },
+  { href: "/services", labelKey: "marketplace", icon: "storefront" },
+  { href: "/orders", labelKey: "orders", icon: "shopping_cart" },
+  { href: "/wallet", labelKey: "wallet", icon: "account_balance_wallet" },
+  { href: "/affiliate", labelKey: "affiliate", icon: "groups" },
+  { href: "/api", labelKey: "api", icon: "code" },
+  { href: "/support", labelKey: "support", icon: "support_agent" },
 ];
 
 // Mobile bottom nav is deliberately curated, not a mirror of the full

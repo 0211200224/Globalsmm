@@ -7,24 +7,27 @@ import { getCurrentUser } from "@/lib/actions/current-user";
 import { getAffiliateSummary } from "@/lib/actions/affiliate";
 import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { formatMessage } from "@/lib/i18n/I18nProvider";
 import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
 
 const ACTIVE_STATUSES: OrderRowStatus[] = ["PENDING", "PROCESSING", "IN_PROGRESS"];
 
-const columns: DataTableColumn<OrderRowData>[] = [
-  { header: "Service", render: (row) => row.serviceName },
-  { header: "Order ID", render: (row) => row.orderCode },
-  { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
-  {
-    header: "Amount",
-    align: "right",
-    render: (row) => <span className="font-bold">{row.chargedAmount}</span>,
-  },
-];
-
 export default async function DashboardPage() {
+  const { dashboard: t } = await getDictionary();
   const user = await getCurrentUser();
   const firstName = (user?.name || user?.email || "there").split(" ")[0];
+
+  const columns: DataTableColumn<OrderRowData>[] = [
+    { header: "Service", render: (row) => row.serviceName },
+    { header: "Order ID", render: (row) => row.orderCode },
+    { header: "Status", render: (row) => <StatusBadge status={row.status} /> },
+    {
+      header: "Amount",
+      align: "right",
+      render: (row) => <span className="font-bold">{row.chargedAmount}</span>,
+    },
+  ];
   const balance = formatUSD(user?.wallet?.balance.toNumber() ?? 0);
 
   const dbOrders = user
@@ -75,30 +78,30 @@ export default async function DashboardPage() {
     <AppShell>
       <div>
         <h2 className="text-headline-lg text-on-surface">
-          Welcome back, {firstName}
+          {formatMessage(t.welcomeBack, { name: firstName })}
         </h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Here&apos;s what&apos;s happening with your account.
+          {t.subtitle}
         </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-gutter">
-        <StatCard label="Wallet Balance" value={balance} icon="account_balance_wallet" accent="secondary" />
-        <StatCard label="Referral Balance" value={referralBalance} icon="group_add" accent="tertiary" />
-        <StatCard label="Total Orders" value={String(totalOrders)} icon="shopping_cart" accent="primary" />
-        <StatCard label="Active Orders" value={String(activeOrders)} icon="bolt" accent="tertiary" />
-        <StatCard label="Completed Orders" value={String(completedOrders)} icon="check_circle" accent="primary" />
-        <StatCard label="Total Spending" value={totalSpending} icon="payments" accent="primary" />
+        <StatCard label={t.walletBalance} value={balance} icon="account_balance_wallet" accent="secondary" />
+        <StatCard label={t.referralBalance} value={referralBalance} icon="group_add" accent="tertiary" />
+        <StatCard label={t.totalOrders} value={String(totalOrders)} icon="shopping_cart" accent="primary" />
+        <StatCard label={t.activeOrders} value={String(activeOrders)} icon="bolt" accent="tertiary" />
+        <StatCard label={t.completedOrders} value={String(completedOrders)} icon="check_circle" accent="primary" />
+        <StatCard label={t.totalSpending} value={totalSpending} icon="payments" accent="primary" />
       </div>
 
       <VipTierCard lifetimeSpend={lifetimeSpend} />
 
       <DataTable
-        title="Recent Orders"
+        title={t.recentOrders}
         columns={columns}
         rows={recentOrders}
         rowKey={(row) => row.id}
-        emptyMessage="No orders yet — head to the Marketplace to place your first one."
+        emptyMessage={t.noOrders}
       />
     </AppShell>
   );

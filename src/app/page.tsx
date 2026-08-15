@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { HeroVisual } from "@/components/marketing/HeroVisual";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
-export default function Home() {
+export default async function Home() {
+  const { marketing: t } = await getDictionary();
+
   return (
     <>
       <MarketingHeader />
@@ -12,24 +15,22 @@ export default function Home() {
           <div className="max-w-container-max mx-auto grid lg:grid-cols-2 gap-12 items-center">
             <div className="z-10 text-center lg:text-left">
               <span className="inline-block py-1 px-4 rounded-full bg-secondary-container/30 text-secondary text-label-sm border border-secondary/20 mb-6">
-                ENTERPRISE GRADE SMM v4.0
+                {t.heroBadge}
               </span>
               <h2 className="text-[44px] md:text-display-xl leading-tight mb-6">
-                The World&apos;s Most{" "}
-                <span className="mesh-gradient-text">Sophisticated</span> SMM
-                Infrastructure
+                {t.heroTitlePrefix}{" "}
+                <span className="mesh-gradient-text">{t.heroTitleHighlight}</span>{" "}
+                {t.heroTitleSuffix}
               </h2>
               <p className="text-body-lg text-on-surface-variant max-w-xl mx-auto lg:mx-0 mb-10">
-                Empowering businesses with enterprise-grade social media
-                growth, high-speed API delivery, and precision metrics across
-                150+ countries.
+                {t.heroDescription}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/register"
                   className="beveled-button bg-primary text-on-primary px-8 py-4 rounded-xl text-label-md font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition-all"
                 >
-                  Get Started
+                  {t.getStarted}
                   <span className="material-symbols-outlined text-[20px]">
                     arrow_forward
                   </span>
@@ -38,7 +39,7 @@ export default function Home() {
                   href="#"
                   className="glass-card px-8 py-4 rounded-xl text-label-md font-semibold text-on-surface hover:bg-white/5 active:scale-95 transition-all"
                 >
-                  View Documentation
+                  {t.viewDocs}
                 </a>
               </div>
             </div>
@@ -415,8 +416,7 @@ export default function Home() {
               GlobalSMM
             </h2>
             <p className="text-body-sm text-on-surface-variant mb-6">
-              The infrastructure layer for the modern social economy.
-              Reliable, scalable, and secure.
+              {t.footerTagline}
             </p>
             <div className="flex gap-4">
               <span className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors cursor-pointer">

@@ -1,19 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateDisplayName } from "@/lib/actions/profile";
+import { setLocale } from "@/lib/actions/locale";
 import { useTheme } from "@/lib/theme";
-
-const LANGUAGE_STORAGE_KEY = "gsmm-language";
-
-const languages = [
-  { code: "en", label: "English" },
-  { code: "pt", label: "Português" },
-  { code: "es", label: "Español" },
-  { code: "fr", label: "Français" },
-  { code: "de", label: "Deutsch" },
-];
+import { useTranslations, useLocale } from "@/lib/i18n/I18nProvider";
+import { SUPPORTED_LOCALES, LOCALE_LABELS, PLANNED_LOCALES, type Locale } from "@/lib/i18n/locales";
 
 export function SettingsView({
   name,
@@ -26,31 +19,20 @@ export function SettingsView({
 }) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const t = useTranslations();
+  const locale = useLocale();
 
   const [nameInput, setNameInput] = useState(name);
   const [savingName, setSavingName] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
   const [nameError, setNameError] = useState<string | null>(null);
+  const [changingLanguage, setChangingLanguage] = useState(false);
 
-  const [language, setLanguage] = useState("en");
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (stored) setLanguage(stored);
-    } catch {
-      // Storage unavailable — default to English.
-    }
-  }, []);
-
-  function handleLanguageChange(code: string) {
-    setLanguage(code);
-    try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
-    } catch {
-      // Preference just won't persist across visits.
-    }
+  async function handleLanguageChange(code: Locale) {
+    setChangingLanguage(true);
+    await setLocale(code);
+    router.refresh();
+    setChangingLanguage(false);
   }
 
   async function handleSaveName(e: React.FormEvent) {
@@ -78,13 +60,13 @@ export function SettingsView({
           <span className="material-symbols-outlined text-primary">
             person
           </span>
-          Profile
+          {t.settings.profile}
         </h3>
 
         <form onSubmit={handleSaveName} className="space-y-4">
           <div className="space-y-2">
             <label className="text-label-md text-on-surface-variant">
-              Display name
+              {t.settings.displayName}
             </label>
             <input
               className="w-full bg-surface-container border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg py-3 px-4 text-on-surface outline-none transition-all"
@@ -99,7 +81,7 @@ export function SettingsView({
 
           <div className="space-y-2">
             <label className="text-label-md text-on-surface-variant">
-              Email
+              {t.settings.email}
             </label>
             <input
               className="w-full bg-surface-container-high border border-outline-variant/50 rounded-lg py-3 px-4 text-on-surface-variant outline-none cursor-not-allowed"
@@ -124,7 +106,7 @@ export function SettingsView({
                 disabled={savingName}
                 className="px-5 py-2.5 rounded-lg bg-primary text-on-primary font-bold hover:brightness-110 active:scale-95 transition-all disabled:opacity-60"
               >
-                {savingName ? "Saving..." : "Save"}
+                {savingName ? t.common.saving : t.common.save}
               </button>
             </div>
           </div>
@@ -137,10 +119,10 @@ export function SettingsView({
           <span className="material-symbols-outlined text-primary">
             palette
           </span>
-          Appearance
+          {t.settings.appearance}
         </h3>
         <p className="text-body-sm text-on-surface-variant">
-          Choose how GlobalSMM looks on this device.
+          {t.settings.appearanceSubtitle}
         </p>
 
         <div className="grid grid-cols-2 gap-3">
@@ -156,7 +138,7 @@ export function SettingsView({
             <span className="material-symbols-outlined text-2xl">
               dark_mode
             </span>
-            <span className="text-label-md font-medium">Dark</span>
+            <span className="text-label-md font-medium">{t.settings.dark}</span>
           </button>
           <button
             type="button"
@@ -170,7 +152,7 @@ export function SettingsView({
             <span className="material-symbols-outlined text-2xl">
               light_mode
             </span>
-            <span className="text-label-md font-medium">Light</span>
+            <span className="text-label-md font-medium">{t.settings.light}</span>
           </button>
         </div>
       </section>
@@ -181,33 +163,36 @@ export function SettingsView({
           <span className="material-symbols-outlined text-primary">
             translate
           </span>
-          Language
+          {t.settings.language}
         </h3>
         <p className="text-body-sm text-on-surface-variant">
-          Pick your preferred language. We&apos;re rolling translations out
-          gradually — the interface stays in English until yours is ready,
-          but your choice is saved for when it launches.
+          {t.settings.languageSubtitle}
         </p>
 
         <div className="flex flex-wrap gap-2">
-          {languages.map((lang) => (
+          {SUPPORTED_LOCALES.map((code) => (
             <button
-              key={lang.code}
+              key={code}
               type="button"
-              onClick={() => handleLanguageChange(lang.code)}
+              disabled={changingLanguage}
+              onClick={() => handleLanguageChange(code)}
               className={
-                language === lang.code
-                  ? "px-4 py-2 rounded-full bg-primary/20 text-primary border border-primary/30 text-label-sm"
-                  : "px-4 py-2 rounded-full border border-outline-variant/50 text-on-surface-variant hover:text-on-surface text-label-sm transition-all"
+                locale === code
+                  ? "px-4 py-2 rounded-full bg-primary/20 text-primary border border-primary/30 text-label-sm disabled:opacity-60"
+                  : "px-4 py-2 rounded-full border border-outline-variant/50 text-on-surface-variant hover:text-on-surface text-label-sm transition-all disabled:opacity-60"
               }
             >
-              {lang.label}
-              {lang.code !== "en" && language === lang.code && (
-                <span className="ml-1.5 text-on-surface-variant/60">
-                  (coming soon)
-                </span>
-              )}
+              {LOCALE_LABELS[code]}
             </button>
+          ))}
+          {PLANNED_LOCALES.map((lang) => (
+            <span
+              key={lang.code}
+              className="px-4 py-2 rounded-full border border-dashed border-outline-variant/40 text-on-surface-variant/50 text-label-sm cursor-not-allowed"
+              title={t.settings.comingSoon}
+            >
+              {lang.label}
+            </span>
           ))}
         </div>
       </section>

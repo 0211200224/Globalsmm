@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const t = useTranslations();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -60,13 +62,8 @@ export default function RegisterPage() {
   return (
     <main className="flex min-h-screen flex-col md:flex-row">
       <AuthMarketingPanel
-        heading={
-          <>
-            Join <span className="text-secondary">5,000+</span> growing
-            businesses
-          </>
-        }
-        description="Create your account and get instant access to enterprise-grade social media infrastructure."
+        heading={t.auth.register.heading}
+        description={t.auth.register.description}
       />
 
       <section className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-margin-x bg-surface-container-low">
@@ -77,27 +74,26 @@ export default function RegisterPage() {
                 mark_email_read
               </span>
               <h2 className="text-headline-md text-on-surface">
-                Check your email
+                {t.auth.register.checkEmailTitle}
               </h2>
               <p className="text-body-md text-on-surface-variant">
-                We sent a confirmation link to your email address. Click it
-                to activate your account, then come back and sign in.
+                {t.auth.register.checkEmailBody}
               </p>
               <Link
                 href="/login"
                 className="inline-block text-primary font-bold hover:underline"
               >
-                Go to sign in
+                {t.auth.register.goToSignIn}
               </Link>
             </div>
           ) : (
             <>
           <div className="text-center md:text-left mb-stack-xl">
             <h2 className="text-headline-md text-on-surface mb-2">
-              Create your account
+              {t.auth.register.title}
             </h2>
             <p className="text-body-md text-on-surface-variant">
-              Start scaling your social presence in minutes.
+              {t.auth.register.subtitle}
             </p>
           </div>
 
@@ -110,7 +106,7 @@ export default function RegisterPage() {
           <form className="space-y-stack-md" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label className="text-label-md text-on-surface-variant block ml-1" htmlFor="name">
-                Full Name
+                {t.auth.register.fullName}
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
@@ -129,7 +125,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label className="text-label-md text-on-surface-variant block ml-1" htmlFor="email">
-                Work Email
+                {t.auth.register.email}
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
@@ -148,7 +144,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label className="text-label-md text-on-surface-variant block ml-1" htmlFor="password">
-                Password
+                {t.auth.register.password}
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
@@ -175,7 +171,7 @@ export default function RegisterPage() {
                 </button>
               </div>
               <p className="text-label-sm text-on-surface-variant/60 ml-1">
-                At least 8 characters.
+                {t.auth.register.passwordHint}
               </p>
             </div>
 
@@ -187,7 +183,7 @@ export default function RegisterPage() {
                 required
               />
               <label className="text-label-md text-on-surface-variant cursor-pointer select-none" htmlFor="terms">
-                I agree to the Terms of Service and Privacy Policy.
+                {t.auth.register.terms}
               </label>
             </div>
 
@@ -196,14 +192,14 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full btn-gradient beveled-button text-on-primary text-label-md py-4 rounded-lg shadow-xl active:scale-95 mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? t.auth.register.submitting : t.auth.register.submit}
             </button>
           </form>
 
           <div className="relative py-4 flex items-center">
             <div className="flex-grow border-t border-outline-variant" />
             <span className="flex-shrink mx-4 text-label-sm text-on-surface-variant/60 uppercase tracking-widest">
-              Or continue with
+              {t.auth.register.orContinue}
             </span>
             <div className="flex-grow border-t border-outline-variant" />
           </div>
@@ -228,9 +224,9 @@ export default function RegisterPage() {
           )}
 
           <div className="pt-stack-lg flex items-center justify-center gap-1 border-t border-outline-variant/30 text-label-sm text-on-surface-variant">
-            Already have an account?
+            {t.auth.register.haveAccount}
             <Link href="/login" className="text-primary font-bold hover:underline ml-1">
-              Sign in
+              {t.auth.register.signIn}
             </Link>
           </div>
         </div>

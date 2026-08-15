@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export function MarketingHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const t = useTranslations().marketing;
 
   return (
     <header className="sticky top-0 w-full z-40 backdrop-blur-md border-b border-white/5 shadow-sm bg-background/70">
@@ -27,16 +29,16 @@ export function MarketingHeader() {
         </div>
         <nav className="hidden md:flex items-center gap-8">
           <Link className="text-label-md text-primary hover:text-primary transition-colors" href="/">
-            Dashboard
+            {t.navDashboard}
           </Link>
           <Link className="text-label-md text-on-surface-variant hover:text-primary transition-colors" href="/services">
-            Services
+            {t.navServices}
           </Link>
           <a className="text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">
-            API
+            {t.navApi}
           </a>
           <a className="text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">
-            Support
+            {t.navSupport}
           </a>
         </nav>
         <div className="flex items-center gap-4">
@@ -47,7 +49,7 @@ export function MarketingHeader() {
             href="/login"
             className="beveled-button bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-label-md active:scale-95 transition-all"
           >
-            Sign In
+            {t.signIn}
           </Link>
         </div>
       </div>
@@ -59,28 +61,28 @@ export function MarketingHeader() {
             href="/"
             onClick={() => setMenuOpen(false)}
           >
-            Dashboard
+            {t.navDashboard}
           </Link>
           <Link
             className="text-label-md text-on-surface-variant py-3"
             href="/services"
             onClick={() => setMenuOpen(false)}
           >
-            Services
+            {t.navServices}
           </Link>
           <a
             className="text-label-md text-on-surface-variant py-3"
             href="#"
             onClick={() => setMenuOpen(false)}
           >
-            API
+            {t.navApi}
           </a>
           <a
             className="text-label-md text-on-surface-variant py-3"
             href="#"
             onClick={() => setMenuOpen(false)}
           >
-            Support
+            {t.navSupport}
           </a>
         </nav>
       )}

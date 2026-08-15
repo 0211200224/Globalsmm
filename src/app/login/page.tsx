@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations, useLocale } from "@/lib/i18n/I18nProvider";
+import { SUPPORTED_LOCALES, LOCALE_LABELS, type Locale } from "@/lib/i18n/locales";
+import { setLocale } from "@/lib/actions/locale";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations();
+  const locale = useLocale();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,9 +24,17 @@ export default function LoginPage() {
     // server-rendered HTML — window/location aren't available during SSR.
     if (new URLSearchParams(window.location.search).get("blocked")) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setError("Your account has been blocked. Contact support for help.");
+      setError(t.auth.login.blocked);
     }
+    // Only the blocked-param check should run on mount; re-running on every
+    // dictionary change would clobber a user-typed error mid-session.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function handleLanguageChange(next: Locale) {
+    await setLocale(next);
+    router.refresh();
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,12 +68,8 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen flex-col md:flex-row">
       <AuthMarketingPanel
-        heading={
-          <>
-            Scale your presence <span className="text-secondary">globally</span>
-          </>
-        }
-        description="The definitive enterprise engine for global social media management and high-volume orchestration."
+        heading={t.auth.login.heading}
+        description={t.auth.login.description}
       />
 
       {/* Right Side: Login Form */}
@@ -68,10 +77,10 @@ export default function LoginPage() {
         <div className="w-full max-w-[440px] space-y-stack-lg">
           <div className="text-center md:text-left mb-stack-xl">
             <h2 className="text-headline-md text-on-surface mb-2">
-              Welcome Back
+              {t.auth.login.welcomeBack}
             </h2>
             <p className="text-body-md text-on-surface-variant">
-              Enter your credentials to access your global dashboard.
+              {t.auth.login.subtitle}
             </p>
           </div>
 
@@ -84,7 +93,7 @@ export default function LoginPage() {
           <form className="space-y-stack-md" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label className="text-label-md text-on-surface-variant block ml-1" htmlFor="email">
-                Work Email
+                {t.auth.login.email}
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
@@ -104,10 +113,10 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
                 <label className="text-label-md text-on-surface-variant block" htmlFor="password">
-                  Password
+                  {t.auth.login.password}
                 </label>
                 <a className="text-label-sm text-primary hover:text-secondary transition-colors" href="#">
-                  Forgot Password?
+                  {t.auth.login.forgotPassword}
                 </a>
               </div>
               <div className="relative group">
@@ -142,7 +151,7 @@ export default function LoginPage() {
                 type="checkbox"
               />
               <label className="text-label-md text-on-surface-variant cursor-pointer select-none" htmlFor="remember">
-                Remember this device for 30 days
+                {t.auth.login.remember}
               </label>
             </div>
 
@@ -151,14 +160,14 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full btn-gradient beveled-button text-on-primary text-label-md py-4 rounded-lg shadow-xl active:scale-95 mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in..." : "Sign In to GlobalSMM"}
+              {loading ? t.auth.login.submitting : t.auth.login.submit}
             </button>
           </form>
 
           <div className="relative py-4 flex items-center">
             <div className="flex-grow border-t border-outline-variant" />
             <span className="flex-shrink mx-4 text-label-sm text-on-surface-variant/60 uppercase tracking-widest">
-              Or continue with
+              {t.auth.login.orContinue}
             </span>
             <div className="flex-grow border-t border-outline-variant" />
           </div>
@@ -204,17 +213,22 @@ export default function LoginPage() {
 
           <div className="pt-stack-lg flex flex-col md:flex-row items-center justify-between gap-4 border-t border-outline-variant/30">
             <div className="relative">
-              <select className="bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pr-8">
-                <option value="en">English (US)</option>
-                <option value="de">Deutsch</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
+              <select
+                className="bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pr-8"
+                value={locale}
+                onChange={(e) => handleLanguageChange(e.target.value as Locale)}
+              >
+                {SUPPORTED_LOCALES.map((code) => (
+                  <option key={code} value={code}>
+                    {LOCALE_LABELS[code]}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="text-label-sm text-on-surface-variant">
-              Don&apos;t have an account?{" "}
+              {t.auth.login.noAccount}{" "}
               <Link href="/register" className="text-primary font-bold hover:underline ml-1">
-                Create an account
+                {t.auth.login.createAccount}
               </Link>
             </div>
           </div>

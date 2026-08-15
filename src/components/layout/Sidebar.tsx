@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navItems } from "./nav-items";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] z-50 border-r border-outline-variant/10 bg-surface-container-low flex-col py-stack-xl gap-stack-md">
@@ -23,7 +25,7 @@ export function Sidebar() {
             GlobalSMM
           </h1>
           <p className="text-label-sm text-on-surface-variant">
-            Enterprise Dashboard
+            {t.marketing.brandTagline}
           </p>
         </div>
       </div>
@@ -43,7 +45,7 @@ export function Sidebar() {
               }
             >
               <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="text-label-md">{item.label}</span>
+              <span className="text-label-md">{t.nav[item.labelKey]}</span>
             </Link>
           );
         })}
@@ -54,7 +56,7 @@ export function Sidebar() {
           <span className="material-symbols-outlined text-[20px]">
             add_circle
           </span>
-          Add Funds
+          {t.nav.addFunds}
         </button>
       </div>
     </aside>
