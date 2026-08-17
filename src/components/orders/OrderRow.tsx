@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { cancelMyOrder, requestRefill } from "@/lib/actions/orders";
-import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 import type { Dictionary } from "@/lib/i18n/dictionary-type";
 import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
 

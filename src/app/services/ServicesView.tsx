@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { OrderModal } from "@/components/services/OrderModal";
-import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 import type { CatalogCategory, CatalogService } from "@/lib/types/catalog";
 
 export function ServicesView({

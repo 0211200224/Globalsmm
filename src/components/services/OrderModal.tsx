@@ -6,7 +6,8 @@ import { createOrder } from "@/lib/actions/orders";
 import { formatUSD } from "@/lib/format";
 import type { CatalogService } from "@/lib/types/catalog";
 import { ServiceQualityStats } from "./ServiceQualityStats";
-import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export function OrderModal({
   service,

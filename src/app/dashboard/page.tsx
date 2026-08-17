@@ -8,7 +8,7 @@ import { getAffiliateSummary } from "@/lib/actions/affiliate";
 import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
-import { formatMessage } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
 
 const ACTIVE_STATUSES: OrderRowStatus[] = ["PENDING", "PROCESSING", "IN_PROGRESS"];

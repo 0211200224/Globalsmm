@@ -1,7 +1,8 @@
 "use client";
 
 import type { CatalogService } from "@/lib/types/catalog";
-import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 type Props = {
   service: Pick<CatalogService, "qualityScore" | "retentionPercent" | "refillDays" | "speedLabel">;

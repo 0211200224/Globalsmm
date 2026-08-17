@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/lib/actions/current-user";
 import { getAffiliateSummary } from "@/lib/actions/affiliate";
 import { formatUSD } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
-import { formatMessage } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 type HistoryRow = {
   id: string;

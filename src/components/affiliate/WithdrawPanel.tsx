@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { requestWithdrawalAction } from "@/lib/actions/withdraw";
 import { formatUSD } from "@/lib/format";
 import { MIN_WITHDRAWAL_USD } from "@/lib/constants";
-import { useTranslations, formatMessage } from "@/lib/i18n/I18nProvider";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export function WithdrawPanel({ available }: { available: number }) {
   const router = useRouter();
