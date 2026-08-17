@@ -260,6 +260,19 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/*
+  StatCard label: scales down with the card's width like the value does,
+  and wraps onto a second line instead of ellipsis-truncating — narrow
+  6-per-row cards were cutting "Referral Balance" down to "Refe...".
+*/
+.stat-card-label {
+  font-size: clamp(0.6875rem, 3.4cqw, 0.875rem);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 .material-symbols-outlined {
   font-variation-settings:
