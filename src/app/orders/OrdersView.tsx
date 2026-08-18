@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { OrderRow } from "@/components/orders/OrderRow";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
-import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
+import { ACTIVE_ORDER_STATUSES, type OrderRowData, type OrderRowStatus } from "@/lib/types/orders";
 
 type Stats = {
   total: number;
@@ -23,7 +23,7 @@ export function OrdersView({
   const t = useTranslations().orders;
   const tabs: Array<{ label: string; statuses: OrderRowStatus[] | "all" }> = [
     { label: t.tabAll, statuses: "all" },
-    { label: t.tabActive, statuses: ["PENDING", "PROCESSING", "IN_PROGRESS"] },
+    { label: t.tabActive, statuses: ACTIVE_ORDER_STATUSES },
     { label: t.tabCompleted, statuses: ["COMPLETED"] },
     { label: t.tabPartial, statuses: ["PARTIAL"] },
     { label: t.tabCanceled, statuses: ["CANCELED", "REFUNDED"] },

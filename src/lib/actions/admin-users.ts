@@ -15,6 +15,17 @@ export async function setUserBlocked(userId: string, blocked: boolean) {
   return { success: true as const };
 }
 
+export async function setUserRole(userId: string, role: "USER" | "ADMIN") {
+  const admin = await assertIsAdmin();
+  if (admin.id === userId) {
+    return { success: false as const, error: "You can't change your own role." };
+  }
+
+  await prisma.user.update({ where: { id: userId }, data: { role } });
+  revalidatePath("/admin/users");
+  return { success: true as const };
+}
+
 export async function setUserReseller(userId: string, isReseller: boolean) {
   await assertIsAdmin();
   await prisma.user.update({ where: { id: userId }, data: { isReseller } });

@@ -12,6 +12,7 @@ import { placeOrder } from "@/lib/order-core";
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING: "Pending",
+  PENDING_ADMIN: "Pending",
   PROCESSING: "Processing",
   IN_PROGRESS: "In progress",
   COMPLETED: "Completed",

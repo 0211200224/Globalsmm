@@ -4,7 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { Pill } from "@/components/ui/Pill";
-import { setUserBlocked, setUserReseller, adjustWalletBalance } from "@/lib/actions/admin-users";
+import {
+  setUserBlocked,
+  setUserReseller,
+  setUserRole,
+  adjustWalletBalance,
+} from "@/lib/actions/admin-users";
 import { formatUSD } from "@/lib/format";
 
 export type AdminUserRow = {
@@ -20,7 +25,13 @@ export type AdminUserRow = {
   joinedAtLabel: string;
 };
 
-export function UsersView({ users }: { users: AdminUserRow[] }) {
+export function UsersView({
+  users,
+  currentAdminId,
+}: {
+  users: AdminUserRow[];
+  currentAdminId: string;
+}) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
@@ -42,6 +53,19 @@ export function UsersView({ users }: { users: AdminUserRow[] }) {
 
   async function handleToggleReseller(user: AdminUserRow) {
     await setUserReseller(user.id, !user.isReseller);
+    router.refresh();
+  }
+
+  async function handleToggleRole(user: AdminUserRow) {
+    const nextRole = user.role === "ADMIN" ? "USER" : "ADMIN";
+    if (!confirm(`${nextRole === "ADMIN" ? "Grant" : "Remove"} admin access for ${user.name}?`)) {
+      return;
+    }
+    const result = await setUserRole(user.id, nextRole);
+    if (!result.success) {
+      alert(result.error);
+      return;
+    }
     router.refresh();
   }
 
@@ -123,6 +147,18 @@ export function UsersView({ users }: { users: AdminUserRow[] }) {
             className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors disabled:opacity-50"
           >
             Adjust Balance
+          </button>
+          <button
+            type="button"
+            disabled={row.id === currentAdminId}
+            onClick={() => handleToggleRole(row)}
+            className={
+              row.role === "ADMIN"
+                ? "px-3 py-1.5 rounded-lg border border-secondary/30 text-secondary hover:bg-secondary/10 text-label-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                : "px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            }
+          >
+            {row.role === "ADMIN" ? "Remove Admin" : "Make Admin"}
           </button>
           <button
             type="button"

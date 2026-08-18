@@ -16,7 +16,13 @@ enum UserRole {
 }
 
 enum OrderStatus {
+  /// Legacy — orders created before the admin-approval queue existed. New
+  /// orders start at PENDING_ADMIN instead (see src/lib/order-core.ts).
   PENDING
+  /// Awaiting admin review in the fulfillment approval queue — the order
+  /// was paid for but not yet sent to any provider (see PLANO.md and
+  /// src/components/admin/PendingApprovalQueue.tsx).
+  PENDING_ADMIN
   PROCESSING
   IN_PROGRESS
   COMPLETED
@@ -127,6 +133,27 @@ model Transaction {
   createdAt   DateTime          @default(now())
 }
 
+/// An upstream SMM fulfillment provider (see PLANO.md section 6 — the
+/// standard-shaped `action=services|add|status|refill|cancel|balance` API
+/// most fornecedores expose). Semi-automatic for now: orders never dispatch
+/// here on their own, only when an admin approves them in the queue.
+model Provider {
+  id        String    @id @default(cuid())
+  name      String
+  apiUrl    String
+  apiKey    String
+  /// Cached from the provider's own balance endpoint — refreshed on demand
+  /// (see syncProviderBalance in src/lib/actions/admin-providers.ts), not
+  /// polled automatically yet.
+  balance   Decimal?  @db.Decimal(12, 2)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  services Service[]
+  orders   Order[]
+}
+
 model ServiceCategory {
   id     String  @id @default(cuid())
   name   String  @unique
@@ -167,6 +194,20 @@ model Service {
   active       Boolean         @default(true)
   createdAt    DateTime        @default(now())
 
+  /// Default provider used to fulfill orders of this service — null means
+  /// still fully manual (admin approval just moves the order to PROCESSING
+  /// without calling any provider API). The admin can still override the
+  /// provider per-order at approval time (see Order.providerId).
+  providerId        String?
+  provider          Provider? @relation(fields: [providerId], references: [id])
+  /// This service's id in the provider's own catalog — required to call
+  /// their `add`/`status`/`refill`/`cancel` actions.
+  externalServiceId String?
+  /// What the provider charges per 1000 units — shown to the admin next to
+  /// pricePer1000 (what the customer pays) in the approval queue, purely
+  /// informational (no margin enforcement).
+  costPer1000       Decimal?  @db.Decimal(10, 4)
+
   orders Order[]
 
   @@index([serviceType])
@@ -185,12 +226,21 @@ model Order {
   deliveredQuantity Int         @default(0)
   targetLink        String
   chargedAmount     Decimal     @db.Decimal(12, 2)
-  status            OrderStatus @default(PENDING)
+  status            OrderStatus @default(PENDING_ADMIN)
   /// WEB = placed through the dashboard, API = placed by a reseller via /api/v2.
   source            OrderSource @default(WEB)
   adminNote         String?
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+
+  /// The provider this order was actually dispatched to (set on admin
+  /// approval — may differ from service.providerId if the admin picked a
+  /// different one in the queue). Null while PENDING_ADMIN or for
+  /// manually-fulfilled orders.
+  providerId        String?
+  provider          Provider?   @relation(fields: [providerId], references: [id])
+  /// The order id returned by the provider's `add` action, once dispatched.
+  externalOrderId   String?
 
   referralCommission ReferralCommission?
   supportTickets     SupportTicket[]

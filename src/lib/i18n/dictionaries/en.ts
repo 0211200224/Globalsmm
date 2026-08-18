@@ -165,6 +165,7 @@ const en = {
     requestingRefill: "Requesting...",
     cancelConfirm: "Cancel this order? The amount will be refunded to your wallet.",
     statusPending: "Pending",
+    statusPendingAdmin: "Pending Approval",
     statusProcessing: "Processing",
     statusInProgress: "In Progress",
     statusCompleted: "Completed",

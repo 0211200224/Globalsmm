@@ -2,10 +2,8 @@ import { AppShell } from "@/components/layout/AppShell";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { formatUSD } from "@/lib/format";
-import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
+import { ACTIVE_ORDER_STATUSES, type OrderRowData, type OrderRowStatus } from "@/lib/types/orders";
 import { OrdersView } from "./OrdersView";
-
-const ACTIVE_STATUSES: OrderRowStatus[] = ["PENDING", "PROCESSING", "IN_PROGRESS"];
 
 export default async function OrdersPage() {
   const user = await getCurrentUser();
@@ -44,7 +42,7 @@ export default async function OrdersPage() {
         day: "numeric",
         year: "numeric",
       }),
-      canCancel: order.status === "PENDING",
+      canCancel: order.status === "PENDING_ADMIN",
       canRefill,
       refillDays: order.service.refillDays,
     };
@@ -52,7 +50,7 @@ export default async function OrdersPage() {
 
   const stats = {
     total: orders.length,
-    active: dbOrders.filter((o) => ACTIVE_STATUSES.includes(o.status as OrderRowStatus))
+    active: dbOrders.filter((o) => ACTIVE_ORDER_STATUSES.includes(o.status as OrderRowStatus))
       .length,
     completed: dbOrders.filter((o) => o.status === "COMPLETED").length,
     totalSpending: formatUSD(

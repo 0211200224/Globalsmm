@@ -19,14 +19,19 @@ export type EditableService = {
   qualityScore: number | null;
   retentionPercent: number | null;
   refillDays: number;
+  providerId: string | null;
+  externalServiceId: string | null;
+  costPer1000: number | null;
 };
 
 export function ServiceFormModal({
   categories,
+  providers,
   existing,
   onClose,
 }: {
   categories: { id: string; name: string }[];
+  providers: { id: string; name: string }[];
   existing: EditableService | null;
   onClose: () => void;
 }) {
@@ -46,6 +51,9 @@ export function ServiceFormModal({
       qualityScore: null,
       retentionPercent: null,
       refillDays: 30,
+      providerId: null,
+      externalServiceId: null,
+      costPer1000: null,
     },
   );
   const [loading, setLoading] = useState(false);
@@ -271,6 +279,64 @@ export function ServiceFormModal({
             <p className="text-label-sm text-on-surface-variant/60">
               Customers can self-serve one auto-approved refill within this window.
             </p>
+          </div>
+
+          <div className="md:col-span-2 border-t border-outline-variant/20 pt-4 mt-2">
+            <p className="text-label-sm text-on-surface-variant font-bold uppercase tracking-wide mb-1">
+              Fulfillment (optional)
+            </p>
+            <p className="text-label-sm text-on-surface-variant/60">
+              Leave the provider unset to keep this service fully manual — approving an order
+              in the queue will just move it to Processing without calling any API.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-label-sm text-on-surface-variant">Provider</label>
+            <select
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
+              value={form.providerId ?? ""}
+              onChange={(e) => setForm({ ...form, providerId: e.target.value || null })}
+            >
+              <option value="">None (manual)</option>
+              {providers.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-label-sm text-on-surface-variant">
+              Provider&apos;s service ID
+            </label>
+            <input
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
+              value={form.externalServiceId ?? ""}
+              onChange={(e) => setForm({ ...form, externalServiceId: e.target.value || null })}
+              placeholder="e.g. 4512"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-label-sm text-on-surface-variant">
+              Provider cost per 1000 (USD, optional)
+            </label>
+            <input
+              className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
+              type="number"
+              step="0.0001"
+              min="0"
+              value={form.costPer1000 ?? ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  costPer1000: e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+              placeholder="Shown next to the customer price in the approval queue"
+            />
           </div>
 
           <div className="md:col-span-2 flex justify-end gap-2 pt-2">

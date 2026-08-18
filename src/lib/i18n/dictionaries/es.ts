@@ -164,6 +164,7 @@ const es: Dictionary = {
     requestingRefill: "Solicitando...",
     cancelConfirm: "¿Cancelar este pedido? El monto será reembolsado a tu billetera.",
     statusPending: "Pendiente",
+    statusPendingAdmin: "Pendiente de Aprobación",
     statusProcessing: "Procesando",
     statusInProgress: "En Progreso",
     statusCompleted: "Completado",

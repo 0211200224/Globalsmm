@@ -9,9 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatMessage } from "@/lib/i18n/format-message";
-import type { OrderRowData, OrderRowStatus } from "@/lib/types/orders";
-
-const ACTIVE_STATUSES: OrderRowStatus[] = ["PENDING", "PROCESSING", "IN_PROGRESS"];
+import { ACTIVE_ORDER_STATUSES, type OrderRowData, type OrderRowStatus } from "@/lib/types/orders";
 
 export default async function DashboardPage() {
   const { dashboard: t } = await getDictionary();
@@ -55,7 +53,7 @@ export default async function DashboardPage() {
     ? await Promise.all([
         prisma.order.count({ where: { userId: user.id } }),
         prisma.order.count({
-          where: { userId: user.id, status: { in: ACTIVE_STATUSES } },
+          where: { userId: user.id, status: { in: ACTIVE_ORDER_STATUSES } },
         }),
         prisma.order.count({ where: { userId: user.id, status: "COMPLETED" } }),
         prisma.order.aggregate({

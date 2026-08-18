@@ -1,9 +1,15 @@
 import { AdminShell } from "@/components/admin/AdminShell";
 import { prisma } from "@/lib/prisma";
 import { getVipTier } from "@/lib/vip";
+import { getCurrentUser } from "@/lib/actions/current-user";
 import { UsersView, type AdminUserRow } from "./UsersView";
 
 export default async function AdminUsersPage() {
+  // getCurrentUser() is wrapped in React's cache() (see current-user.ts), so
+  // this resolves from memory rather than a fresh round trip — AdminShell
+  // calls it too within the same request. AdminLayout has already verified
+  // role === "ADMIN" before this page can render at all.
+  const currentAdmin = await getCurrentUser();
   const [dbUsers, spendByUser] = await Promise.all([
     prisma.user.findMany({
       include: { wallet: true },
@@ -50,7 +56,7 @@ export default async function AdminUsersPage() {
         </p>
       </div>
 
-      <UsersView users={users} />
+      <UsersView users={users} currentAdminId={currentAdmin?.id ?? ""} />
     </AdminShell>
   );
 }

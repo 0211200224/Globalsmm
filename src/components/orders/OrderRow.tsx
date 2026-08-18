@@ -27,6 +27,14 @@ const statusStyles: Record<
     valueClass: "text-on-surface-variant",
     labelClass: "text-on-surface-variant",
   },
+  PENDING_ADMIN: {
+    labelKey: "statusPendingAdmin",
+    badgeClass: "bg-tertiary-container/40 border-tertiary/30 text-tertiary",
+    barClass: "bg-tertiary/40",
+    valueClass: "text-tertiary",
+    labelClass: "text-on-surface-variant",
+    dot: true,
+  },
   PROCESSING: {
     labelKey: "statusProcessing",
     badgeClass:

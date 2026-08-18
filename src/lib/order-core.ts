@@ -95,7 +95,7 @@ export async function placeOrder({
           quantity,
           targetLink: link,
           chargedAmount,
-          status: "PENDING",
+          status: "PENDING_ADMIN",
           source,
         },
       });

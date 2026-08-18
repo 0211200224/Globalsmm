@@ -4,10 +4,13 @@ import { ServicesAdminView, type AdminServiceRow } from "./ServicesAdminView";
 import type { EditableCategory } from "./CategoryManager";
 
 export default async function AdminServicesPage() {
-  const dbCategories = await prisma.serviceCategory.findMany({
-    orderBy: { sortOrder: "asc" },
-    include: { services: { orderBy: { name: "asc" } }, _count: { select: { services: true } } },
-  });
+  const [dbCategories, dbProviders] = await Promise.all([
+    prisma.serviceCategory.findMany({
+      orderBy: { sortOrder: "asc" },
+      include: { services: { orderBy: { name: "asc" } }, _count: { select: { services: true } } },
+    }),
+    prisma.provider.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
+  ]);
 
   const categories: EditableCategory[] = dbCategories.map((c) => ({
     id: c.id,
@@ -35,12 +38,17 @@ export default async function AdminServicesPage() {
       retentionPercent: service.retentionPercent,
       refillDays: service.refillDays,
       active: service.active,
+      providerId: service.providerId,
+      externalServiceId: service.externalServiceId,
+      costPer1000: service.costPer1000?.toNumber() ?? null,
     })),
   );
 
+  const providers = dbProviders.map((p) => ({ id: p.id, name: p.name }));
+
   return (
     <AdminShell>
-      <ServicesAdminView services={services} categories={categories} />
+      <ServicesAdminView services={services} categories={categories} providers={providers} />
     </AdminShell>
   );
 }

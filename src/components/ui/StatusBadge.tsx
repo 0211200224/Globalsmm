@@ -6,6 +6,7 @@ import type { OrderRowStatus } from "@/lib/types/orders";
 
 const statusStyles: Record<OrderRowStatus, string> = {
   PENDING: "bg-outline-variant/20 text-on-surface-variant",
+  PENDING_ADMIN: "bg-tertiary-container/40 text-tertiary",
   PROCESSING: "bg-secondary-container/20 text-secondary",
   IN_PROGRESS: "bg-primary/10 text-primary",
   COMPLETED: "bg-green-500/10 text-green-400",
@@ -16,6 +17,7 @@ const statusStyles: Record<OrderRowStatus, string> = {
 
 const statusLabelKeys: Record<OrderRowStatus, keyof Dictionary["orders"]> = {
   PENDING: "statusPending",
+  PENDING_ADMIN: "statusPendingAdmin",
   PROCESSING: "statusProcessing",
   IN_PROGRESS: "statusInProgress",
   COMPLETED: "statusCompleted",

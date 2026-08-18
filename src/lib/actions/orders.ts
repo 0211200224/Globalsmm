@@ -68,8 +68,9 @@ export async function createOrder({
 
 /**
  * User-facing cancel — deliberately narrower than the admin action in
- * admin-orders.ts: only allowed while still PENDING, before any work could
- * plausibly have started, so it never needs an admin judgment call.
+ * admin-orders.ts: only allowed while still PENDING_ADMIN (awaiting admin
+ * review), before any work could plausibly have started, so it never needs
+ * an admin judgment call.
  */
 export async function cancelMyOrder(orderId: string) {
   const user = await getRequester();
@@ -79,7 +80,7 @@ export async function cancelMyOrder(orderId: string) {
   if (!order || order.userId !== user.id) {
     return { success: false as const, error: "Order not found." };
   }
-  if (order.status !== "PENDING") {
+  if (order.status !== "PENDING_ADMIN") {
     return {
       success: false as const,
       error: "This order is already being processed — contact support to cancel it.",

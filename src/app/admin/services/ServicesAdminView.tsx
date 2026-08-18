@@ -16,9 +16,11 @@ export type AdminServiceRow = EditableService & {
 export function ServicesAdminView({
   services,
   categories,
+  providers,
 }: {
   services: AdminServiceRow[];
   categories: EditableCategory[];
+  providers: { id: string; name: string }[];
 }) {
   const router = useRouter();
   const [formTarget, setFormTarget] = useState<"new" | AdminServiceRow | null>(null);
@@ -135,6 +137,7 @@ export function ServicesAdminView({
       {formTarget && (
         <ServiceFormModal
           categories={categories}
+          providers={providers}
           existing={formTarget === "new" ? null : formTarget}
           onClose={() => setFormTarget(null)}
         />

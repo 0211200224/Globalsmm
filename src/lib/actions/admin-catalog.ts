@@ -18,6 +18,9 @@ export type ServiceInput = {
   qualityScore?: number | null;
   retentionPercent?: number | null;
   refillDays: number;
+  providerId?: string | null;
+  externalServiceId?: string | null;
+  costPer1000?: number | null;
 };
 
 function validateServiceInput(input: ServiceInput): string | null {
@@ -68,6 +71,9 @@ export async function createService(input: ServiceInput) {
       qualityScore: input.qualityScore ?? null,
       retentionPercent: input.retentionPercent ?? null,
       refillDays: input.refillDays,
+      providerId: input.providerId || null,
+      externalServiceId: input.externalServiceId?.trim() || null,
+      costPer1000: input.costPer1000 ?? null,
     },
   });
 
@@ -98,6 +104,9 @@ export async function updateService(id: string, input: ServiceInput) {
       qualityScore: input.qualityScore ?? null,
       retentionPercent: input.retentionPercent ?? null,
       refillDays: input.refillDays,
+      providerId: input.providerId || null,
+      externalServiceId: input.externalServiceId?.trim() || null,
+      costPer1000: input.costPer1000 ?? null,
     },
   });
 

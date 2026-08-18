@@ -164,6 +164,7 @@ const pt: Dictionary = {
     requestingRefill: "Solicitando...",
     cancelConfirm: "Cancelar este pedido? O valor será reembolsado para sua carteira.",
     statusPending: "Pendente",
+    statusPendingAdmin: "Aguardando Aprovação",
     statusProcessing: "Processando",
     statusInProgress: "Em Andamento",
     statusCompleted: "Concluído",
