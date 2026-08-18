@@ -13,9 +13,15 @@ const globalForPrisma = globalThis as unknown as {
 // Transaction pooler (PgBouncer), which already does the real pooling. A
 // large `max` here just multiplies connections across instances and can
 // exhaust the pooler.
+// node-postgres has no default connection timeout -- without one, a slow or
+// unreachable database makes every query hang forever instead of failing
+// with a readable error (this is what "login just spins forever" turned out
+// to be, more than once). 10s is generous for a Vercel function's own
+// execution limit to still kick in as a fallback.
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
   max: 3,
+  connectionTimeoutMillis: 10_000,
 });
 
 // Cached on globalThis in every environment (not just dev): in serverless,
