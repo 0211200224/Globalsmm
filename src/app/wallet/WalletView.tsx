@@ -1,19 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { TransactionStatusBadge } from "@/components/wallet/TransactionStatusBadge";
-import { mockTransactions, paymentMethods, type MockTransaction } from "./data";
+import { paymentMethods, type WalletTransactionRow } from "./data";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { createDepositCheckoutSession } from "@/lib/actions/wallet";
 
 const presetAmounts = [50, 100, 500];
 
-export function WalletView({ balance }: { balance: string }) {
+export function WalletView({
+  balance,
+  transactions,
+}: {
+  balance: string;
+  transactions: WalletTransactionRow[];
+}) {
   const t = useTranslations().wallet;
+  const router = useRouter();
   const [amount, setAmount] = useState("");
   const [selectedMethod, setSelectedMethod] = useState("stripe");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const columns: DataTableColumn<MockTransaction>[] = [
+  useEffect(() => {
+    // Read directly from the URL (see the same pattern/rationale in
+    // src/app/login/page.tsx) instead of useSearchParams(), then strip the
+    // param so a refresh doesn't re-show the banner.
+    const params = new URLSearchParams(window.location.search);
+    const deposit = params.get("deposit");
+    if (deposit === "success") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNotice(t.depositPending);
+      router.replace("/wallet");
+    } else if (deposit === "canceled") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(t.depositCanceled);
+      router.replace("/wallet");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const columns: DataTableColumn<WalletTransactionRow>[] = [
     {
       header: "Transaction ID",
       render: (row) => (
@@ -48,11 +78,19 @@ export function WalletView({ balance }: { balance: string }) {
     },
   ];
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO(Fase 3 -> Stripe): trocar por uma chamada ao backend que cria um
-    // Payment Intent / Checkout Session do Stripe para `amount`, e credita a
-    // Wallet via webhook quando o pagamento for confirmado.
+    setError(null);
+    setSubmitting(true);
+
+    const result = await createDepositCheckoutSession(Number(amount));
+    if (!result.success) {
+      setError(result.error);
+      setSubmitting(false);
+      return;
+    }
+
+    window.location.href = result.url;
   }
 
   return (
@@ -65,6 +103,13 @@ export function WalletView({ balance }: { balance: string }) {
           {t.subtitle}
         </p>
       </div>
+
+      {notice && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-body-sm rounded-lg px-4 py-3 flex items-center gap-2">
+          <span className="material-symbols-outlined text-lg">check_circle</span>
+          {notice}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
         {/* Left Column: Balance & Deposit Form */}
@@ -138,11 +183,15 @@ export function WalletView({ balance }: { balance: string }) {
                   </button>
                 ))}
               </div>
+              {error && (
+                <p className="text-center text-body-sm text-error">{error}</p>
+              )}
               <button
                 type="submit"
-                className="w-full py-4 bg-gradient-to-r from-secondary-container to-secondary/80 text-white font-bold rounded-lg shadow-lg shadow-secondary/10 hover:shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                disabled={submitting}
+                className="w-full py-4 bg-gradient-to-r from-secondary-container to-secondary/80 text-white font-bold rounded-lg shadow-lg shadow-secondary/10 hover:shadow-secondary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <span>{t.proceedToPayment}</span>
+                <span>{submitting ? t.submitting : t.proceedToPayment}</span>
                 <span className="material-symbols-outlined">
                   arrow_forward
                 </span>
@@ -245,8 +294,9 @@ export function WalletView({ balance }: { balance: string }) {
               </div>
             }
             columns={columns}
-            rows={mockTransactions}
+            rows={transactions}
             rowKey={(row) => row.id}
+            emptyMessage={t.noTransactions}
           />
         </div>
       </div>

@@ -180,14 +180,18 @@ const en = {
     addFunds: "Add Funds",
     amountToAdd: "Amount to Add (USD)",
     proceedToPayment: "Proceed to Payment",
+    submitting: "Redirecting to checkout...",
     secureTransaction: "Secure encrypted transaction",
     paymentMethods: "Payment Methods",
     paymentNote: "Note:",
     paymentNoteBody:
       "Processing fees vary per method. Additional payment methods are rolling out after launch.",
     transactionHistory: "Transaction History",
+    noTransactions: "No transactions yet.",
     filter: "Filter",
     export: "Export",
+    depositPending: "Payment received — your balance will update in a few seconds.",
+    depositCanceled: "Deposit canceled. No charge was made.",
   },
   affiliate: {
     title: "Ambassador Performance",

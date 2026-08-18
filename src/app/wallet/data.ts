@@ -52,7 +52,7 @@ export const paymentMethods: PaymentMethod[] = [
 
 export type TransactionStatus = "completed" | "processing" | "declined";
 
-export type MockTransaction = {
+export type WalletTransactionRow = {
   id: string;
   txId: string;
   date: string;
@@ -62,47 +62,3 @@ export type MockTransaction = {
   amount: string;
   status: TransactionStatus;
 };
-
-// Placeholder history until Fase 3 wires this up to the `Transaction` Prisma model.
-export const mockTransactions: MockTransaction[] = [
-  {
-    id: "1",
-    txId: "#TX-942103",
-    date: "Oct 24, 2023 14:22",
-    method: "BTC Transfer",
-    icon: "currency_bitcoin",
-    iconColorClass: "text-orange-500",
-    amount: "$500.00",
-    status: "completed",
-  },
-  {
-    id: "2",
-    txId: "#TX-941098",
-    date: "Oct 22, 2023 09:15",
-    method: "Card (Stripe)",
-    icon: "credit_card",
-    iconColorClass: "text-indigo-500",
-    amount: "$100.00",
-    status: "completed",
-  },
-  {
-    id: "3",
-    txId: "#TX-939855",
-    date: "Oct 20, 2023 21:40",
-    method: "PayPal",
-    icon: "payments",
-    iconColorClass: "text-blue-500",
-    amount: "$250.00",
-    status: "processing",
-  },
-  {
-    id: "4",
-    txId: "#TX-938722",
-    date: "Oct 18, 2023 12:05",
-    method: "Card (Stripe)",
-    icon: "credit_card",
-    iconColorClass: "text-error",
-    amount: "$50.00",
-    status: "declined",
-  },
-];
