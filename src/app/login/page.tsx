@@ -22,11 +22,15 @@ export default function LoginPage() {
     // can stay statically prerendered. Must run post-mount (not as a lazy
     // useState initializer) so the client's first render still matches the
     // server-rendered HTML — window/location aren't available during SSR.
-    if (new URLSearchParams(window.location.search).get("blocked")) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("blocked")) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(t.auth.login.blocked);
+    } else if (params.get("error") === "oauth_failed") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setError(t.auth.login.oauthFailed);
     }
-    // Only the blocked-param check should run on mount; re-running on every
+    // Only the URL-param check should run on mount; re-running on every
     // dictionary change would clobber a user-typed error mid-session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -34,6 +38,16 @@ export default function LoginPage() {
   async function handleLanguageChange(next: Locale) {
     await setLocale(next);
     router.refresh();
+  }
+
+  async function handleOAuthSignIn(provider: "google" | "facebook" | "github") {
+    setError(null);
+    const supabase = createClient();
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+    if (oauthError) setError(oauthError.message);
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -175,6 +189,7 @@ export default function LoginPage() {
           <div className="space-y-3">
             <button
               type="button"
+              onClick={() => handleOAuthSignIn("google")}
               className="w-full flex items-center justify-center gap-3 border border-outline-variant hover:border-primary/50 hover:bg-surface-container-high py-3 rounded-lg transition-all active:scale-[0.98]"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -190,6 +205,7 @@ export default function LoginPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
+                onClick={() => handleOAuthSignIn("facebook")}
                 className="flex items-center justify-center gap-2 border border-outline-variant hover:border-primary/50 hover:bg-surface-container-high py-3 rounded-lg transition-all active:scale-[0.98]"
               >
                 <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
@@ -201,6 +217,7 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
+                onClick={() => handleOAuthSignIn("github")}
                 className="flex items-center justify-center gap-2 border border-outline-variant hover:border-primary/50 hover:bg-surface-container-high py-3 rounded-lg transition-all active:scale-[0.98]"
               >
                 <svg className="w-5 h-5 text-on-surface" fill="currentColor" viewBox="0 0 24 24">

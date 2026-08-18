@@ -8,8 +8,8 @@ const PROTECTED_PREFIXES = [
   "/wallet",
   "/affiliate",
   // Requires being signed in, but NOT yet restricted to admins — that needs a
-  // role check (Supabase custom claim or a `User.role` lookup) once Auth is
-  // wired up. Until then this only stops anonymous access.
+  // role check (Supabase custom claim or a `User.role` lookup), done
+  // separately in src/app/admin/layout.tsx. This only stops anonymous access.
   "/admin",
 ];
 

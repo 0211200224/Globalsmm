@@ -56,6 +56,7 @@ const pt: Dictionary = {
       noAccount: "Não tem uma conta?",
       createAccount: "Criar uma conta",
       blocked: "Sua conta foi bloqueada. Entre em contato com o suporte para ajuda.",
+      oauthFailed: "Não foi possível entrar com a rede social. Tente novamente ou use email e senha.",
     },
     register: {
       heading: "Junte-se a mais de 5.000 negócios em crescimento",

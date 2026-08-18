@@ -56,6 +56,7 @@ const fr: Dictionary = {
       noAccount: "Vous n'avez pas de compte ?",
       createAccount: "Créer un compte",
       blocked: "Votre compte a été bloqué. Contactez le support pour obtenir de l'aide.",
+      oauthFailed: "La connexion sociale a échoué. Réessayez ou utilisez votre email et mot de passe.",
     },
     register: {
       heading: "Rejoignez plus de 5 000 entreprises en croissance",

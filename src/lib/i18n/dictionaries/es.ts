@@ -56,6 +56,7 @@ const es: Dictionary = {
       noAccount: "¿No tienes una cuenta?",
       createAccount: "Crear una cuenta",
       blocked: "Tu cuenta ha sido bloqueada. Contacta con soporte para obtener ayuda.",
+      oauthFailed: "No se pudo iniciar sesión con la red social. Intenta de nuevo o usa tu email y contraseña.",
     },
     register: {
       heading: "Únete a más de 5.000 negocios en crecimiento",

@@ -59,6 +59,20 @@ export default function RegisterPage() {
     router.refresh();
   }
 
+  async function handleGoogleSignUp() {
+    setError(null);
+    const referredByCode = new URLSearchParams(window.location.search).get("ref");
+    const redirectTo = new URL("/auth/callback", window.location.origin);
+    if (referredByCode) redirectTo.searchParams.set("ref", referredByCode);
+
+    const supabase = createClient();
+    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: redirectTo.toString() },
+    });
+    if (oauthError) setError(oauthError.message);
+  }
+
   return (
     <main className="flex min-h-screen flex-col md:flex-row">
       <AuthMarketingPanel
@@ -207,6 +221,7 @@ export default function RegisterPage() {
           <div className="space-y-3">
             <button
               type="button"
+              onClick={handleGoogleSignUp}
               className="w-full flex items-center justify-center gap-3 border border-outline-variant hover:border-primary/50 hover:bg-surface-container-high py-3 rounded-lg transition-all active:scale-[0.98]"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

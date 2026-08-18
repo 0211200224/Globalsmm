@@ -57,6 +57,7 @@ const en = {
       noAccount: "Don't have an account?",
       createAccount: "Create an account",
       blocked: "Your account has been blocked. Contact support for help.",
+      oauthFailed: "Social sign-in failed. Please try again or use your email and password.",
     },
     register: {
       heading: "Join 5,000+ growing businesses",
