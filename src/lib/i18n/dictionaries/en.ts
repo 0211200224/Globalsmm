@@ -19,6 +19,7 @@ const en = {
     affiliate: "Affiliate",
     api: "API",
     support: "Support",
+    adminPanel: "Admin Panel",
     exitAdmin: "Exit Admin",
     addFunds: "Add Funds",
   },

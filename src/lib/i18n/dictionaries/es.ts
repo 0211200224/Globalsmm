@@ -18,6 +18,7 @@ const es: Dictionary = {
     affiliate: "Afiliados",
     api: "API",
     support: "Soporte",
+    adminPanel: "Panel Admin",
     exitAdmin: "Salir del Admin",
     addFunds: "Añadir Saldo",
   },

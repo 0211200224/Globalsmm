@@ -32,7 +32,7 @@ export async function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="min-h-screen">
-      <Sidebar />
+      <Sidebar isAdmin={user?.role === "ADMIN"} />
       <div className="md:ml-[280px] min-h-screen relative pb-20 md:pb-0">
         <TopBar
           userName={userName}

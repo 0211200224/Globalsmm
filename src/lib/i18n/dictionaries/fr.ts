@@ -18,6 +18,7 @@ const fr: Dictionary = {
     affiliate: "Affiliation",
     api: "API",
     support: "Support",
+    adminPanel: "Panneau Admin",
     exitAdmin: "Quitter l'Admin",
     addFunds: "Ajouter des Fonds",
   },

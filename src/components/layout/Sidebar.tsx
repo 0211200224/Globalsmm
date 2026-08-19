@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { navItems } from "./nav-items";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
 
-export function Sidebar() {
+export function Sidebar({ isAdmin }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   const t = useTranslations();
 
@@ -49,6 +49,19 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {isAdmin && (
+          <>
+            <div className="my-2 border-t border-outline-variant/20" />
+            <Link
+              href="/admin"
+              className="flex items-center gap-4 px-4 py-3 text-tertiary font-bold hover:bg-tertiary/10 transition-all duration-200"
+            >
+              <span className="material-symbols-outlined">shield_person</span>
+              <span className="text-label-md">{t.nav.adminPanel}</span>
+            </Link>
+          </>
+        )}
       </nav>
 
       <div className="px-6 mt-auto">
