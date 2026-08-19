@@ -4,15 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
+import { AuthTopBar } from "@/components/marketing/AuthTopBar";
 import { createClient } from "@/lib/supabase/client";
-import { useTranslations, useLocale } from "@/lib/i18n/I18nProvider";
-import { SUPPORTED_LOCALES, LOCALE_LABELS, type Locale } from "@/lib/i18n/locales";
-import { setLocale } from "@/lib/actions/locale";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export default function LoginPage() {
   const router = useRouter();
   const t = useTranslations();
-  const locale = useLocale();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,11 +32,6 @@ export default function LoginPage() {
     // dictionary change would clobber a user-typed error mid-session.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  async function handleLanguageChange(next: Locale) {
-    await setLocale(next);
-    router.refresh();
-  }
 
   async function handleOAuthSignIn(provider: "google" | "facebook" | "github") {
     setError(null);
@@ -80,7 +73,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col md:flex-row">
+    <>
+      <AuthTopBar />
+      <main className="flex min-h-screen flex-col md:flex-row">
       <AuthMarketingPanel
         heading={t.auth.login.heading}
         description={t.auth.login.description}
@@ -228,20 +223,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="pt-stack-lg flex flex-col md:flex-row items-center justify-between gap-4 border-t border-outline-variant/30">
-            <div className="relative">
-              <select
-                className="bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pr-8"
-                value={locale}
-                onChange={(e) => handleLanguageChange(e.target.value as Locale)}
-              >
-                {SUPPORTED_LOCALES.map((code) => (
-                  <option key={code} value={code}>
-                    {LOCALE_LABELS[code]}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="pt-stack-lg flex items-center justify-center gap-4 border-t border-outline-variant/30">
             <div className="text-label-sm text-on-surface-variant">
               {t.auth.login.noAccount}{" "}
               <Link href="/register" className="text-primary font-bold hover:underline ml-1">
@@ -251,6 +233,7 @@ export default function LoginPage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

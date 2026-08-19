@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { HeaderControls } from "./HeaderControls";
 
 type TopBarProps = {
   userName: string;
@@ -33,6 +34,7 @@ export function TopBar({
       </div>
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-4">
+          <HeaderControls />
           {notificationSlot}
           <Link
             href="/settings"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthMarketingPanel } from "@/components/marketing/AuthMarketingPanel";
+import { AuthTopBar } from "@/components/marketing/AuthTopBar";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
 
@@ -74,7 +75,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col md:flex-row">
+    <>
+      <AuthTopBar />
+      <main className="flex min-h-screen flex-col md:flex-row">
       <AuthMarketingPanel
         heading={t.auth.register.heading}
         description={t.auth.register.description}
@@ -246,6 +249,7 @@ export default function RegisterPage() {
           </div>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
