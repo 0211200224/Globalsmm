@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { updateOrderStatus } from "@/lib/actions/admin-orders";
+import { updateOrderStatus, checkOrderStatus } from "@/lib/actions/admin-orders";
 import type { OrderRowStatus } from "@/lib/types/orders";
 
 export type AdminOrderRow = {
@@ -15,6 +15,8 @@ export type AdminOrderRow = {
   amount: string;
   status: OrderRowStatus;
   createdAtLabel: string;
+  /** Was this order actually dispatched to a provider (has providerId + externalOrderId)? */
+  dispatchedToProvider: boolean;
 };
 
 const statusOptions: OrderRowStatus[] = [
@@ -46,6 +48,20 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
         alert(result.error ?? "Failed to update order status.");
         return;
       }
+      router.refresh();
+    });
+  }
+
+  function handleCheckStatus(id: string) {
+    setPendingId(id);
+    startTransition(async () => {
+      const result = await checkOrderStatus(id);
+      setPendingId(null);
+      if (!result.success) {
+        alert(result.error);
+        return;
+      }
+      alert(`Provider reports: ${result.providerStatus}`);
       router.refresh();
     });
   }
@@ -88,6 +104,17 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
               </option>
             ))}
           </select>
+          {row.dispatchedToProvider && (
+            <button
+              type="button"
+              disabled={isPending && pendingId === row.id}
+              onClick={() => handleCheckStatus(row.id)}
+              title="Fetch the live status from the provider"
+              className="p-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[18px]">sync</span>
+            </button>
+          )}
         </div>
       ),
     },

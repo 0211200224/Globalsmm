@@ -35,6 +35,7 @@ export default async function AdminOrdersPage() {
       hour: "2-digit",
       minute: "2-digit",
     }),
+    dispatchedToProvider: Boolean(order.providerId && order.externalOrderId),
   }));
 
   const pendingRows: PendingApprovalRow[] = pendingOrders.map((order) => {
