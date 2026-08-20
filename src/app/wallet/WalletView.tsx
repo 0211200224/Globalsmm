@@ -6,7 +6,7 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { TransactionStatusBadge } from "@/components/wallet/TransactionStatusBadge";
 import { paymentMethods, type WalletTransactionRow } from "./data";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
-import { createDepositCheckoutSession } from "@/lib/actions/wallet";
+import { createDepositCheckoutSession, createFapshiDeposit } from "@/lib/actions/wallet";
 import type { CurrencyCode } from "@/lib/currency/currencies";
 
 const presetAmounts = [50, 100, 500];
@@ -86,7 +86,10 @@ export function WalletView({
     setError(null);
     setSubmitting(true);
 
-    const result = await createDepositCheckoutSession(Number(amount));
+    const result =
+      selectedMethod === "fapshi"
+        ? await createFapshiDeposit(Number(amount))
+        : await createDepositCheckoutSession(Number(amount));
     if (!result.success) {
       setError(result.error);
       setSubmitting(false);

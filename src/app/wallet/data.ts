@@ -8,9 +8,9 @@ export type PaymentMethod = {
   enabled: boolean;
 };
 
-// Only Stripe ships in the MVP (see PLANO.md, decisions table). The others are
-// kept visible — reserved layout space — so they can be enabled later without
-// a redesign.
+// Stripe and Fapshi ship (see PLANO.md, decisions table, and Fase 6 of the
+// migration plan). The rest are kept visible — reserved layout space — so
+// they can be enabled later without a redesign.
 export const paymentMethods: PaymentMethod[] = [
   {
     id: "stripe",
@@ -19,6 +19,15 @@ export const paymentMethods: PaymentMethod[] = [
     icon: "credit_card",
     iconColorClass: "text-indigo-500",
     iconBgClass: "bg-indigo-500/10",
+    enabled: true,
+  },
+  {
+    id: "fapshi",
+    name: "Fapshi (MTN/Orange Mobile Money)",
+    description: "Cameroon",
+    icon: "smartphone",
+    iconColorClass: "text-emerald-500",
+    iconBgClass: "bg-emerald-500/10",
     enabled: true,
   },
   {
