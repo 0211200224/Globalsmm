@@ -24,6 +24,11 @@ export function ServicesAdminView({
 }) {
   const router = useRouter();
   const [formTarget, setFormTarget] = useState<"new" | AdminServiceRow | null>(null);
+  const [connectedOnly, setConnectedOnly] = useState(false);
+
+  const visibleServices = connectedOnly
+    ? services.filter((s) => s.providerId && s.externalServiceId)
+    : services;
 
   async function handleToggleActive(row: AdminServiceRow) {
     await toggleServiceActive(row.id, !row.active);
@@ -73,6 +78,26 @@ export function ServicesAdminView({
           {row.active ? "Active" : "Inactive"}
         </Pill>
       ),
+    },
+    {
+      header: "Fulfillment",
+      render: (row) => {
+        const connected = Boolean(row.providerId && row.externalServiceId);
+        return (
+          <div className="flex items-center gap-2" title={connected ? "Connected to a provider" : "Manual — no provider mapped"}>
+            <span
+              className={
+                connected
+                  ? "w-2 h-2 rounded-full bg-emerald-400 animate-pulse"
+                  : "w-2 h-2 rounded-full bg-outline-variant"
+              }
+            />
+            <span className="text-label-sm text-on-surface-variant">
+              {connected ? "Connected" : "Manual"}
+            </span>
+          </div>
+        );
+      },
     },
     {
       header: "Actions",
@@ -127,11 +152,26 @@ export function ServicesAdminView({
       <CategoryManager categories={categories} />
 
       <DataTable
-        title={`${services.length} services`}
+        title={`${visibleServices.length} of ${services.length} services`}
+        action={
+          <label className="flex items-center gap-2 text-label-sm text-on-surface-variant cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={connectedOnly}
+              onChange={(e) => setConnectedOnly(e.target.checked)}
+              className="w-4 h-4 rounded border-outline-variant accent-tertiary cursor-pointer"
+            />
+            Connected only
+          </label>
+        }
         columns={columns}
-        rows={services}
+        rows={visibleServices}
         rowKey={(row) => row.id}
-        emptyMessage="No services yet — create one to get started."
+        emptyMessage={
+          connectedOnly
+            ? "No services are connected to a provider yet."
+            : "No services yet — create one to get started."
+        }
       />
 
       {formTarget && (
