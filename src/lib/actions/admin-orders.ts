@@ -187,6 +187,7 @@ export async function approveOrder(orderId: string, providerIdOverride?: string 
       externalServiceId: order.service.externalServiceId,
       link: order.targetLink,
       quantity: order.quantity,
+      idempotencyKey: order.id,
     });
 
     await prisma.$transaction(async (tx) => {

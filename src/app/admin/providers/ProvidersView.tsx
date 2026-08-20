@@ -6,6 +6,7 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { Pill } from "@/components/ui/Pill";
 import { toggleProviderActive, syncProviderBalance } from "@/lib/actions/admin-providers";
 import { ProviderFormModal, type EditableProvider } from "./ProviderFormModal";
+import { ProviderCatalogModal } from "./ProviderCatalogModal";
 
 export type AdminProviderRow = {
   id: string;
@@ -22,6 +23,7 @@ export function ProvidersView({ providers }: { providers: AdminProviderRow[] }) 
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [formTarget, setFormTarget] = useState<"new" | EditableProvider | null>(null);
+  const [catalogTarget, setCatalogTarget] = useState<AdminProviderRow | null>(null);
 
   function handleToggleActive(row: AdminProviderRow) {
     startTransition(async () => {
@@ -87,6 +89,13 @@ export function ProvidersView({ providers }: { providers: AdminProviderRow[] }) 
           </button>
           <button
             type="button"
+            onClick={() => setCatalogTarget(row)}
+            className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
+          >
+            View Catalog
+          </button>
+          <button
+            type="button"
             onClick={() => setFormTarget(row)}
             className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
           >
@@ -130,6 +139,14 @@ export function ProvidersView({ providers }: { providers: AdminProviderRow[] }) 
         <ProviderFormModal
           existing={formTarget === "new" ? null : formTarget}
           onClose={() => setFormTarget(null)}
+        />
+      )}
+
+      {catalogTarget && (
+        <ProviderCatalogModal
+          providerId={catalogTarget.id}
+          providerName={catalogTarget.name}
+          onClose={() => setCatalogTarget(null)}
         />
       )}
     </>

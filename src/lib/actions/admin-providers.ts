@@ -99,3 +99,22 @@ export async function syncProviderBalance(id: string) {
     return { success: false as const, error: `Could not fetch balance: ${message}` };
   }
 }
+
+/**
+ * Fetches the provider's live catalog on demand (not cached/stored) — lets
+ * the admin find the right externalServiceId for a Service instead of
+ * copying it by hand from the provider's own dashboard.
+ */
+export async function listProviderCatalog(id: string) {
+  await assertIsAdmin();
+  const provider = await prisma.provider.findUnique({ where: { id } });
+  if (!provider) return { success: false as const, error: "Provider not found." };
+
+  try {
+    const services = await getProviderClient(provider).listServices();
+    return { success: true as const, services };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return { success: false as const, error: `Could not fetch catalog: ${message}` };
+  }
+}

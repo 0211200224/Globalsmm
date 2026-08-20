@@ -2,10 +2,12 @@ import "server-only";
 import { ProviderRequestError, type OrderFulfillmentProvider } from "./types";
 
 /**
- * Implements the de-facto standard SMM panel reseller API (sometimes
- * called "Perfect Panel API v2" — see PLANO.md section 6): a single
- * endpoint, POST, form-encoded, differentiated by an `action` field.
- * Covers most upstream providers without needing a class per vendor.
+ * Implements the JSON single-endpoint SMM reseller API shape (confirmed
+ * against smm.africa/api-docs — POST application/json, one `action` field
+ * per operation: services|add|status|refill|cancel|balance). Sends the key
+ * both in the body (every documented example does this) and as a Bearer
+ * header (what the docs' auth section names as "the" mechanism) since
+ * sending both is harmless and covers either reading of an inconsistent doc.
  */
 export class GenericSmmProvider implements OrderFulfillmentProvider {
   constructor(
@@ -14,15 +16,16 @@ export class GenericSmmProvider implements OrderFulfillmentProvider {
     private readonly apiKey: string,
   ) {}
 
-  private async call(params: Record<string, string | number>): Promise<Record<string, unknown>> {
-    const body = new URLSearchParams({ key: this.apiKey, ...toStringParams(params) });
-
+  private async call(params: Record<string, unknown>): Promise<Record<string, unknown>> {
     let response: Response;
     try {
       response = await fetch(this.apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`,
+        },
+        body: JSON.stringify({ key: this.apiKey, ...params }),
       });
     } catch (err) {
       throw new ProviderRequestError(
@@ -35,19 +38,26 @@ export class GenericSmmProvider implements OrderFulfillmentProvider {
       throw new ProviderRequestError(`${this.name} returned HTTP ${response.status}`, this.name);
     }
 
-    const data = (await response.json()) as Record<string, unknown>;
-    if (typeof data.error === "string") {
-      throw new ProviderRequestError(`${this.name} rejected the request: ${data.error}`, this.name);
+    const data = (await response.json()) as Record<string, unknown> | unknown[];
+    const record = Array.isArray(data) ? { list: data } : data;
+    if (typeof record.error === "string") {
+      throw new ProviderRequestError(`${this.name} rejected the request: ${record.error}`, this.name);
     }
-    return data;
+    return record;
   }
 
-  async placeOrder(input: { externalServiceId: string; link: string; quantity: number }) {
+  async placeOrder(input: {
+    externalServiceId: string;
+    link: string;
+    quantity: number;
+    idempotencyKey?: string;
+  }) {
     const data = await this.call({
       action: "add",
       service: input.externalServiceId,
       link: input.link,
       quantity: input.quantity,
+      ...(input.idempotencyKey ? { idempotency_key: input.idempotencyKey } : {}),
     });
     const externalOrderId = data.order != null ? String(data.order) : null;
     if (!externalOrderId) {
@@ -80,8 +90,20 @@ export class GenericSmmProvider implements OrderFulfillmentProvider {
     }
     return balance;
   }
-}
 
-function toStringParams(params: Record<string, string | number>): Record<string, string> {
-  return Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]));
+  async listServices() {
+    const data = await this.call({ action: "services" });
+    const list = Array.isArray(data.list) ? data.list : [];
+    return list
+      .filter((row): row is Record<string, unknown> => typeof row === "object" && row !== null)
+      .map((row) => ({
+        id: String(row.service ?? ""),
+        name: typeof row.name === "string" ? row.name : "Unnamed service",
+        rate: Number(row.rate ?? 0),
+        min: Number(row.min ?? 0),
+        max: Number(row.max ?? 0),
+        category: typeof row.category === "string" ? row.category : undefined,
+      }))
+      .filter((s) => s.id !== "");
+  }
 }
