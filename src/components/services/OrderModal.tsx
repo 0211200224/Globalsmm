@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createOrder } from "@/lib/actions/orders";
-import { formatUSD } from "@/lib/format";
+import { useCurrency } from "@/lib/currency/CurrencyProvider";
 import type { CatalogService } from "@/lib/types/catalog";
 import { ServiceQualityStats } from "./ServiceQualityStats";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
@@ -20,6 +20,7 @@ export function OrderModal({
 }) {
   const router = useRouter();
   const t = useTranslations().orderModal;
+  const { format } = useCurrency();
   const [targetLink, setTargetLink] = useState("");
   const [quantity, setQuantity] = useState(service.minQuantity);
   const [loading, setLoading] = useState(false);
@@ -169,11 +170,11 @@ export function OrderModal({
                 <div className="text-right">
                   {discountPercent > 0 && (
                     <span className="block text-label-sm text-on-surface-variant/60 line-through font-mono">
-                      {formatUSD(Number.isFinite(basePrice) ? basePrice : 0)}
+                      {format(Number.isFinite(basePrice) ? basePrice : 0)}
                     </span>
                   )}
                   <span className="text-headline-md text-secondary font-mono">
-                    {formatUSD(Number.isFinite(total) ? total : 0)}
+                    {format(Number.isFinite(total) ? total : 0)}
                   </span>
                 </div>
               </div>

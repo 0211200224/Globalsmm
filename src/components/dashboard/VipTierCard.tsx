@@ -1,7 +1,10 @@
-import { formatUSD } from "@/lib/format";
+"use client";
+
+import { useCurrency } from "@/lib/currency/CurrencyProvider";
 import { getVipTier, getNextVipTier } from "@/lib/vip";
 
 export function VipTierCard({ lifetimeSpend }: { lifetimeSpend: number }) {
+  const { format } = useCurrency();
   const tier = getVipTier(lifetimeSpend);
   const next = getNextVipTier(lifetimeSpend);
   const progressPercent = next
@@ -31,9 +34,9 @@ export function VipTierCard({ lifetimeSpend }: { lifetimeSpend: number }) {
       {next ? (
         <div className="space-y-1.5">
           <div className="flex justify-between text-label-sm text-on-surface-variant">
-            <span>{formatUSD(lifetimeSpend)} spent</span>
+            <span>{format(lifetimeSpend)} spent</span>
             <span>
-              {formatUSD(Math.max(0, next.minSpend - lifetimeSpend))} to {next.name}
+              {format(Math.max(0, next.minSpend - lifetimeSpend))} to {next.name}
             </span>
           </div>
           <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">

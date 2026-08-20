@@ -6,7 +6,9 @@ import { VipTierCard } from "@/components/dashboard/VipTierCard";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { getAffiliateSummary } from "@/lib/actions/affiliate";
 import { prisma } from "@/lib/prisma";
-import { formatUSD } from "@/lib/format";
+import { getCurrency } from "@/lib/currency/get-currency";
+import { getRates } from "@/lib/currency/get-rates";
+import { formatMoney } from "@/lib/currency/format-money";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatMessage } from "@/lib/i18n/format-message";
 import { ACTIVE_ORDER_STATUSES, type OrderRowData, type OrderRowStatus } from "@/lib/types/orders";
@@ -15,6 +17,9 @@ export default async function DashboardPage() {
   const { dashboard: t } = await getDictionary();
   const user = await getCurrentUser();
   const firstName = (user?.name || user?.email || "there").split(" ")[0];
+  const currency = await getCurrency();
+  const rates = await getRates();
+  const money = (usd: number | string) => formatMoney(usd, currency, rates);
 
   const columns: DataTableColumn<OrderRowData>[] = [
     { header: "Service", render: (row) => row.serviceName },
@@ -26,7 +31,7 @@ export default async function DashboardPage() {
       render: (row) => <span className="font-bold">{row.chargedAmount}</span>,
     },
   ];
-  const balance = formatUSD(user?.wallet?.balance.toNumber() ?? 0);
+  const balance = money(user?.wallet?.balance.toNumber() ?? 0);
 
   const dbOrders = user
     ? await prisma.order.findMany({
@@ -45,7 +50,7 @@ export default async function DashboardPage() {
     quantity: order.quantity,
     deliveredQuantity: order.deliveredQuantity,
     status: order.status as OrderRowStatus,
-    chargedAmount: formatUSD(order.chargedAmount.toNumber()),
+    chargedAmount: money(order.chargedAmount.toNumber()),
     createdAtLabel: order.createdAt.toLocaleDateString("en-US"),
   }));
 
@@ -68,9 +73,9 @@ export default async function DashboardPage() {
       ])
     : [0, 0, 0, { _sum: { chargedAmount: null } }, { _sum: { chargedAmount: null } }, null];
 
-  const totalSpending = formatUSD(spendingAgg._sum.chargedAmount?.toNumber() ?? 0);
+  const totalSpending = money(spendingAgg._sum.chargedAmount?.toNumber() ?? 0);
   const lifetimeSpend = qualifyingSpendAgg._sum.chargedAmount?.toNumber() ?? 0;
-  const referralBalance = formatUSD(affiliateSummary?.available ?? 0);
+  const referralBalance = money(affiliateSummary?.available ?? 0);
 
   return (
     <AppShell>

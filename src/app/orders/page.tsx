@@ -1,12 +1,17 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/actions/current-user";
-import { formatUSD } from "@/lib/format";
+import { getCurrency } from "@/lib/currency/get-currency";
+import { getRates } from "@/lib/currency/get-rates";
+import { formatMoney } from "@/lib/currency/format-money";
 import { ACTIVE_ORDER_STATUSES, type OrderRowData, type OrderRowStatus } from "@/lib/types/orders";
 import { OrdersView } from "./OrdersView";
 
 export default async function OrdersPage() {
   const user = await getCurrentUser();
+  const currency = await getCurrency();
+  const rates = await getRates();
+  const money = (usd: number | string) => formatMoney(usd, currency, rates);
 
   const dbOrders = user
     ? await prisma.order.findMany({
@@ -36,7 +41,7 @@ export default async function OrdersPage() {
       quantity: order.quantity,
       deliveredQuantity: order.deliveredQuantity,
       status: order.status as OrderRowStatus,
-      chargedAmount: formatUSD(order.chargedAmount.toNumber()),
+      chargedAmount: money(order.chargedAmount.toNumber()),
       createdAtLabel: order.createdAt.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -53,7 +58,7 @@ export default async function OrdersPage() {
     active: dbOrders.filter((o) => ACTIVE_ORDER_STATUSES.includes(o.status as OrderRowStatus))
       .length,
     completed: dbOrders.filter((o) => o.status === "COMPLETED").length,
-    totalSpending: formatUSD(
+    totalSpending: money(
       dbOrders.reduce((sum, o) => sum + o.chargedAmount.toNumber(), 0),
     ),
   };

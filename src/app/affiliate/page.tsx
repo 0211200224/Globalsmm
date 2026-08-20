@@ -6,7 +6,9 @@ import { ReferralStatusBadge } from "@/components/affiliate/ReferralStatusBadge"
 import { WithdrawPanel } from "@/components/affiliate/WithdrawPanel";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { getAffiliateSummary } from "@/lib/actions/affiliate";
-import { formatUSD } from "@/lib/format";
+import { getCurrency } from "@/lib/currency/get-currency";
+import { getRates } from "@/lib/currency/get-rates";
+import { formatMoney } from "@/lib/currency/format-money";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 import { formatMessage } from "@/lib/i18n/format-message";
 
@@ -52,6 +54,9 @@ export default async function AffiliatePage() {
   const { affiliate: t } = await getDictionary();
   const user = await getCurrentUser();
   const summary = user ? await getAffiliateSummary(user.id) : null;
+  const currency = await getCurrency();
+  const rates = await getRates();
+  const money = (usd: number | string) => formatMoney(usd, currency, rates);
 
   const headersList = await headers();
   const host = headersList.get("host") ?? "globalsmm.com";
@@ -67,8 +72,8 @@ export default async function AffiliatePage() {
       .charAt(0)
       .toUpperCase(),
     date: commission.createdAt.toLocaleDateString("en-US"),
-    amount: formatUSD(commission.order.chargedAmount.toNumber()),
-    commission: formatUSD(commission.amount.toNumber()),
+    amount: money(commission.order.chargedAmount.toNumber()),
+    commission: money(commission.amount.toNumber()),
     status: commission.status,
   }));
 
@@ -127,10 +132,10 @@ export default async function AffiliatePage() {
                 {t.availableCommission}
               </p>
               <h4 className="text-display-xl text-on-surface mt-1">
-                {formatUSD(summary?.available ?? 0)}
+                {money(summary?.available ?? 0)}
               </h4>
               <p className="text-label-sm text-on-surface/50 mt-2">
-                + {formatUSD(summary?.pending ?? 0)} {t.pendingSuffix}
+                + {money(summary?.pending ?? 0)} {t.pendingSuffix}
               </p>
             </div>
           </div>
@@ -176,7 +181,7 @@ export default async function AffiliatePage() {
             </span>
           </div>
           <div className="mt-4 text-headline-md text-on-surface">
-            {formatUSD(summary?.pending ?? 0)}
+            {money(summary?.pending ?? 0)}
           </div>
         </div>
         <div className="glass-panel p-stack-md rounded-xl">
@@ -189,7 +194,7 @@ export default async function AffiliatePage() {
             </span>
           </div>
           <div className="mt-4 text-headline-md text-on-surface">
-            {formatUSD(summary?.totalPaid ?? 0)}
+            {money(summary?.totalPaid ?? 0)}
           </div>
         </div>
       </div>

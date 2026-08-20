@@ -1,7 +1,9 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { prisma } from "@/lib/prisma";
-import { formatUSD } from "@/lib/format";
+import { getCurrency } from "@/lib/currency/get-currency";
+import { getRates } from "@/lib/currency/get-rates";
+import { formatMoney } from "@/lib/currency/format-money";
 import { WalletView } from "./WalletView";
 import type { WalletTransactionRow, TransactionStatus } from "./data";
 
@@ -26,7 +28,10 @@ const TYPE_ICON: Record<string, { icon: string; iconColorClass: string; sign: "+
 
 export default async function WalletPage() {
   const user = await getCurrentUser();
-  const balance = formatUSD(user?.wallet?.balance.toNumber() ?? 0);
+  const currency = await getCurrency();
+  const rates = await getRates();
+  const money = (usd: number | string) => formatMoney(usd, currency, rates);
+  const balance = money(user?.wallet?.balance.toNumber() ?? 0);
 
   const dbTransactions = user?.wallet
     ? await prisma.transaction.findMany({
@@ -45,14 +50,14 @@ export default async function WalletPage() {
       method: METHOD_LABELS[tx.method] ?? tx.method,
       icon: typeInfo.icon,
       iconColorClass: typeInfo.iconColorClass,
-      amount: `${typeInfo.sign}${formatUSD(tx.amount.toNumber())}`,
+      amount: `${typeInfo.sign}${money(tx.amount.toNumber())}`,
       status: STATUS_MAP[tx.status] ?? "processing",
     };
   });
 
   return (
     <AppShell>
-      <WalletView balance={balance} transactions={transactions} />
+      <WalletView balance={balance} currency={currency} transactions={transactions} />
     </AppShell>
   );
 }

@@ -1,6 +1,8 @@
 import { AppShell } from "@/components/layout/AppShell";
 import { prisma } from "@/lib/prisma";
-import { formatUSD } from "@/lib/format";
+import { getCurrency } from "@/lib/currency/get-currency";
+import { getRates } from "@/lib/currency/get-rates";
+import { formatMoney } from "@/lib/currency/format-money";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { getEffectiveDiscountPercent } from "@/lib/vip";
 import type { CatalogCategory } from "@/lib/types/catalog";
@@ -8,6 +10,8 @@ import { ServicesView } from "./ServicesView";
 
 export default async function ServicesPage() {
   const user = await getCurrentUser();
+  const currency = await getCurrency();
+  const rates = await getRates();
 
   const [dbCategories, spendAgg] = await Promise.all([
     prisma.serviceCategory.findMany({
@@ -42,7 +46,7 @@ export default async function ServicesPage() {
       badge: service.badge,
       speedLabel: service.speedLabel,
       serviceType: service.serviceType,
-      pricePer1000: formatUSD(service.pricePer1000.toNumber()),
+      pricePer1000: formatMoney(service.pricePer1000.toNumber(), currency, rates),
       pricePer1000Raw: service.pricePer1000.toNumber(),
       minQuantity: service.minQuantity,
       maxQuantity: service.maxQuantity,

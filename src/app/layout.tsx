@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { getLocale, getDictionary } from "@/lib/i18n/get-dictionary";
 import { I18nProvider } from "@/lib/i18n/I18nProvider";
+import { getCurrency } from "@/lib/currency/get-currency";
+import { getRates } from "@/lib/currency/get-rates";
+import { CurrencyProvider } from "@/lib/currency/CurrencyProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -27,6 +30,8 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale();
   const dict = await getDictionary(locale);
+  const currency = await getCurrency();
+  const rates = await getRates();
 
   return (
     <html
@@ -39,7 +44,9 @@ export default async function RootLayout({
       </head>
       <body className="custom-scroll min-h-full flex flex-col bg-background text-on-background font-sans selection:bg-secondary/30">
         <I18nProvider locale={locale} dict={dict}>
-          {children}
+          <CurrencyProvider currency={currency} rates={rates}>
+            {children}
+          </CurrencyProvider>
         </I18nProvider>
       </body>
     </html>

@@ -7,14 +7,17 @@ import { TransactionStatusBadge } from "@/components/wallet/TransactionStatusBad
 import { paymentMethods, type WalletTransactionRow } from "./data";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
 import { createDepositCheckoutSession } from "@/lib/actions/wallet";
+import type { CurrencyCode } from "@/lib/currency/currencies";
 
 const presetAmounts = [50, 100, 500];
 
 export function WalletView({
   balance,
+  currency,
   transactions,
 }: {
   balance: string;
+  currency: CurrencyCode;
   transactions: WalletTransactionRow[];
 }) {
   const t = useTranslations().wallet;
@@ -134,7 +137,7 @@ export function WalletView({
                 <span className="text-display-xl text-white font-mono">
                   {balance}
                 </span>
-                <span className="text-body-lg text-primary/60">USD</span>
+                <span className="text-body-lg text-primary/60">{currency}</span>
               </div>
             </div>
             <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-secondary/10 rounded-full blur-3xl group-hover:bg-secondary/20 transition-colors" />
