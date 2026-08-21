@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe";
 import { initiatePay } from "@/lib/fapshi";
 import { getRates } from "@/lib/currency/get-rates";
+import { reconcileFapshiTransaction } from "@/lib/fapshi-reconcile";
+import { createNotification } from "@/lib/actions/notifications";
 
 const MIN_DEPOSIT_USD = 5;
 const MAX_DEPOSIT_USD = 10000;
@@ -145,7 +147,7 @@ export async function createFapshiDeposit(amount: number): Promise<CreateDeposit
     const { link, transId } = await initiatePay({
       amount: amountXaf,
       email: user.email,
-      redirectUrl: `${origin}/wallet?deposit=success`,
+      redirectUrl: `${origin}/wallet?deposit=success&method=fapshi&tx=${transaction.id}`,
       externalId: transaction.id,
       message: "GlobalSMM wallet deposit",
     });
@@ -161,4 +163,51 @@ export async function createFapshiDeposit(amount: number): Promise<CreateDeposit
     await prisma.transaction.update({ where: { id: transaction.id }, data: { status: "FAILED" } });
     return { success: false, error: "Could not start Fapshi checkout. Please try again." };
   }
+}
+
+export type FapshiDepositCheckResult = { status: "completed" | "processing" | "failed" };
+
+/**
+ * Called once when the customer's browser lands back on /wallet from
+ * Fapshi's hosted payment page (see the redirectUrl above). By the time
+ * the redirect happens the payment has usually already settled on Fapshi's
+ * side, so this tries to resolve it right here instead of making the
+ * customer wait for the webhook or the once-a-day cron sweep
+ * (src/app/api/cron/sync-fapshi-deposits) to catch up. If it's still not
+ * resolved at this point, every admin gets notified to check it by hand --
+ * the cron sweep stays as the fallback net for deposits nobody's watching
+ * (e.g. the customer closed the tab before the redirect completed).
+ */
+export async function checkFapshiDepositReturn(transactionId: string): Promise<FapshiDepositCheckResult> {
+  const user = await getRequester();
+  if (!user?.wallet) return { status: "processing" };
+
+  const transaction = await prisma.transaction.findUnique({ where: { id: transactionId } });
+  if (!transaction || transaction.walletId !== user.wallet.id || transaction.method !== "fapshi") {
+    return { status: "processing" };
+  }
+
+  const result = await reconcileFapshiTransaction(transactionId);
+
+  if (result.success && result.providerStatus === "SUCCESSFUL") {
+    return { status: "completed" };
+  }
+  if (result.success && (result.providerStatus === "FAILED" || result.providerStatus === "EXPIRED")) {
+    return { status: "failed" };
+  }
+
+  const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } });
+  await Promise.all(
+    admins.map((admin) =>
+      createNotification({
+        userId: admin.id,
+        type: "SYSTEM",
+        title: "Fapshi deposit still pending",
+        body: `A customer's Fapshi deposit hasn't confirmed yet after checkout. Check transaction ${transaction.id} in Payments.`,
+        link: "/admin/payments",
+      }),
+    ),
+  );
+
+  return { status: "processing" };
 }

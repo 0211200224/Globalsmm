@@ -193,6 +193,9 @@ const en = {
     filter: "Filter",
     export: "Export",
     depositPending: "Payment received — your balance will update in a few seconds.",
+    depositProcessing: "Your payment is being processed — this can take a few minutes. We'll update your balance automatically as soon as it's confirmed.",
+    depositConfirmed: "Deposit confirmed! Your balance has been updated.",
+    depositFailed: "Your payment could not be confirmed. If you were charged, please contact support.",
     depositCanceled: "Deposit canceled. No charge was made.",
   },
   affiliate: {

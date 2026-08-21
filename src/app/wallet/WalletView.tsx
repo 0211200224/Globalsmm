@@ -6,7 +6,11 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { TransactionStatusBadge } from "@/components/wallet/TransactionStatusBadge";
 import { paymentMethods, type WalletTransactionRow } from "./data";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
-import { createDepositCheckoutSession, createFapshiDeposit } from "@/lib/actions/wallet";
+import {
+  createDepositCheckoutSession,
+  createFapshiDeposit,
+  checkFapshiDepositReturn,
+} from "@/lib/actions/wallet";
 import type { CurrencyCode } from "@/lib/currency/currencies";
 
 const presetAmounts = [50, 100, 500];
@@ -34,7 +38,21 @@ export function WalletView({
     // param so a refresh doesn't re-show the banner.
     const params = new URLSearchParams(window.location.search);
     const deposit = params.get("deposit");
-    if (deposit === "success") {
+    const method = params.get("method");
+    const tx = params.get("tx");
+
+    if (deposit === "success" && method === "fapshi" && tx) {
+      router.replace("/wallet");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNotice(t.depositProcessing);
+      checkFapshiDepositReturn(tx).then((result) => {
+        if (result.status === "completed") setNotice(t.depositConfirmed);
+        else if (result.status === "failed") {
+          setNotice(null);
+          setError(t.depositFailed);
+        } else setNotice(t.depositProcessing);
+      });
+    } else if (deposit === "success") {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotice(t.depositPending);
       router.replace("/wallet");
