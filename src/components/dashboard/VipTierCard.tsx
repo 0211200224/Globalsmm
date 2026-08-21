@@ -33,8 +33,7 @@ export function VipTierCard({ lifetimeSpend }: { lifetimeSpend: number }) {
 
       {next ? (
         <div className="space-y-1.5">
-          <div className="flex justify-between text-label-sm text-on-surface-variant">
-            <span>{format(lifetimeSpend)} spent</span>
+          <div className="flex justify-end text-label-sm text-on-surface-variant">
             <span>
               {format(Math.max(0, next.minSpend - lifetimeSpend))} to {next.name}
             </span>

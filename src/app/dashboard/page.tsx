@@ -54,7 +54,7 @@ export default async function DashboardPage() {
     createdAtLabel: order.createdAt.toLocaleDateString("en-US"),
   }));
 
-  const [totalOrders, activeOrders, completedOrders, spendingAgg, qualifyingSpendAgg, affiliateSummary] = user
+  const [totalOrders, activeOrders, completedOrders, qualifyingSpendAgg, affiliateSummary] = user
     ? await Promise.all([
         prisma.order.count({ where: { userId: user.id } }),
         prisma.order.count({
@@ -62,18 +62,13 @@ export default async function DashboardPage() {
         }),
         prisma.order.count({ where: { userId: user.id, status: "COMPLETED" } }),
         prisma.order.aggregate({
-          where: { userId: user.id },
-          _sum: { chargedAmount: true },
-        }),
-        prisma.order.aggregate({
           where: { userId: user.id, status: { notIn: ["CANCELED", "REFUNDED"] } },
           _sum: { chargedAmount: true },
         }),
         getAffiliateSummary(user.id),
       ])
-    : [0, 0, 0, { _sum: { chargedAmount: null } }, { _sum: { chargedAmount: null } }, null];
+    : [0, 0, 0, { _sum: { chargedAmount: null } }, null];
 
-  const totalSpending = money(spendingAgg._sum.chargedAmount?.toNumber() ?? 0);
   const lifetimeSpend = qualifyingSpendAgg._sum.chargedAmount?.toNumber() ?? 0;
   const referralBalance = money(affiliateSummary?.available ?? 0);
 
@@ -88,13 +83,12 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-gutter">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-gutter">
         <StatCard label={t.walletBalance} value={balance} icon="account_balance_wallet" accent="secondary" />
         <StatCard label={t.referralBalance} value={referralBalance} icon="group_add" accent="tertiary" />
         <StatCard label={t.totalOrders} value={String(totalOrders)} icon="shopping_cart" accent="primary" />
         <StatCard label={t.activeOrders} value={String(activeOrders)} icon="bolt" accent="tertiary" />
         <StatCard label={t.completedOrders} value={String(completedOrders)} icon="check_circle" accent="primary" />
-        <StatCard label={t.totalSpending} value={totalSpending} icon="payments" accent="primary" />
       </div>
 
       <VipTierCard lifetimeSpend={lifetimeSpend} />
