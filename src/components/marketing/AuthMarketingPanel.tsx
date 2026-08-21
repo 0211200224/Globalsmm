@@ -1,3 +1,5 @@
+import { OrbitGlobe } from "./OrbitGlobe";
+
 type AuthMarketingPanelProps = {
   heading: React.ReactNode;
   description: string;
@@ -49,6 +51,10 @@ export function AuthMarketingPanel({
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="relative z-10 py-4 hidden md:flex md:flex-1 md:items-center md:justify-center">
+        <OrbitGlobe />
       </div>
     </section>
   );

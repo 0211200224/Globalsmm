@@ -283,3 +283,36 @@ body {
   display: inline-block;
   vertical-align: middle;
 }
+
+/*
+  OrbitGlobe (login/register marketing panel): a 3D-feeling globe + orbiting
+  platform-logo chips, entirely CSS transforms/opacity (GPU-composited, no
+  JS, no images, no 3D library) -- see src/components/marketing/OrbitGlobe.tsx.
+  globe-spin fakes sphere rotation by squashing a shaded circle around its
+  Y axis. orbit-cw/orbit-ccw walk an icon chip around a circle of radius
+  --orbit-radius while counter-rotating it so the icon itself stays upright
+  (classic three-transform CSS orbit trick, interpolated because the from/
+  and to keyframes have the same transform-function list).
+*/
+@keyframes globe-spin {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+@keyframes orbit-cw {
+  from { transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg); }
+}
+@keyframes orbit-ccw {
+  from { transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg); }
+  to { transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg); }
+}
+@keyframes globe-glow-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-globe * {
+    animation-play-state: paused !important;
+  }
+}
