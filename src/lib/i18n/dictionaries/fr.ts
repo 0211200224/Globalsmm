@@ -313,6 +313,9 @@ const fr: Dictionary = {
       statusPending: "En attente",
       statusCompleted: "Terminé",
       statusFailed: "Échoué",
+      colActions: "Actions",
+      syncStatus: "Synchroniser le Statut",
+      syncing: "Synchronisation…",
     },
     providers: {
       title: "Fournisseurs de Traitement",

@@ -313,6 +313,9 @@ const es: Dictionary = {
       statusPending: "Pendiente",
       statusCompleted: "Completado",
       statusFailed: "Fallido",
+      colActions: "Acciones",
+      syncStatus: "Sincronizar Estado",
+      syncing: "Sincronizando…",
     },
     providers: {
       title: "Proveedores de Cumplimiento",

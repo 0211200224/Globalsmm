@@ -315,6 +315,9 @@ const en = {
       statusPending: "Pending",
       statusCompleted: "Completed",
       statusFailed: "Failed",
+      colActions: "Actions",
+      syncStatus: "Sync Status",
+      syncing: "Syncing…",
     },
     providers: {
       title: "Fulfillment Providers",
