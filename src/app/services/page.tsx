@@ -9,9 +9,11 @@ import type { CatalogCategory } from "@/lib/types/catalog";
 import { ServicesView } from "./ServicesView";
 
 export default async function ServicesPage() {
-  const user = await getCurrentUser();
-  const currency = await getCurrency();
-  const rates = await getRates();
+  const [user, currency, rates] = await Promise.all([
+    getCurrentUser(),
+    getCurrency(),
+    getRates(),
+  ]);
 
   const [dbCategories, spendAgg] = await Promise.all([
     prisma.serviceCategory.findMany({

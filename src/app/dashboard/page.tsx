@@ -14,11 +14,13 @@ import { formatMessage } from "@/lib/i18n/format-message";
 import { ACTIVE_ORDER_STATUSES, type OrderRowData, type OrderRowStatus } from "@/lib/types/orders";
 
 export default async function DashboardPage() {
-  const { dashboard: t } = await getDictionary();
-  const user = await getCurrentUser();
+  const [{ dashboard: t }, user, currency, rates] = await Promise.all([
+    getDictionary(),
+    getCurrentUser(),
+    getCurrency(),
+    getRates(),
+  ]);
   const firstName = (user?.name || user?.email || "there").split(" ")[0];
-  const currency = await getCurrency();
-  const rates = await getRates();
   const money = (usd: number | string) => formatMoney(usd, currency, rates);
 
   const columns: DataTableColumn<OrderRowData>[] = [
