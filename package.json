@@ -12,6 +12,7 @@
     "db:seed": "node scripts/with-direct-url.js npx prisma db seed"
   },
   "dependencies": {
+    "@icons-pack/react-simple-icons": "^13.15.1",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@supabase/ssr": "^0.12.4",

@@ -6,6 +6,7 @@ import { createOrder } from "@/lib/actions/orders";
 import { useCurrency } from "@/lib/currency/CurrencyProvider";
 import type { CatalogService } from "@/lib/types/catalog";
 import { ServiceQualityStats } from "./ServiceQualityStats";
+import { QualityBadge } from "./QualityBadge";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
 import { formatMessage } from "@/lib/i18n/format-message";
 
@@ -91,7 +92,8 @@ export function OrderModal({
                 <p className="text-[11px] text-on-surface-variant/70 uppercase tracking-wider font-bold mb-1">
                   {service.categoryName} · {service.serviceType}
                 </p>
-                <h3 className="text-headline-md text-on-surface">{service.name}</h3>
+                <h3 className="text-headline-md text-on-surface mb-2">{service.name}</h3>
+                <QualityBadge qualityScore={service.qualityScore} />
               </div>
 
               <button

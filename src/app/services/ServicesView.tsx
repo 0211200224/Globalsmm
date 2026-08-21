@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { OrderModal } from "@/components/services/OrderModal";
+import { PlatformIcon } from "@/components/services/PlatformIcon";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
 import { formatMessage } from "@/lib/i18n/format-message";
+import { getServiceTypeEmoji } from "@/lib/services/type-emoji";
 import type { CatalogCategory, CatalogService } from "@/lib/types/catalog";
 
 export function ServicesView({
@@ -24,6 +26,19 @@ export function ServicesView({
     () => categories.flatMap((c) => c.services),
     [categories],
   );
+
+  useEffect(() => {
+    // Lets the homepage's platform tiles deep-link straight into a filtered
+    // marketplace (?platform=Instagram) instead of dropping the customer on
+    // an unfiltered list they'd have to click through again.
+    const requested = new URLSearchParams(window.location.search).get("platform");
+    if (!requested) return;
+    const match = categories.find(
+      (c) => c.name.toLowerCase() === requested.toLowerCase(),
+    );
+    if (match) setPlatform(match.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const typesForPlatform = useMemo(() => {
     const source =
@@ -106,9 +121,7 @@ export function ServicesView({
                   : "px-6 py-2.5 rounded-full border border-outline-variant hover:border-secondary text-on-surface-variant hover:text-on-surface text-label-md whitespace-nowrap transition-all flex items-center gap-2"
               }
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {category.icon}
-              </span>
+              <PlatformIcon name={category.name} fallbackIcon={category.icon} className="text-[18px]" />
               {category.name}
             </button>
           ))}
@@ -135,10 +148,11 @@ export function ServicesView({
                 onClick={() => setServiceType(type)}
                 className={
                   serviceType === type
-                    ? "px-4 py-1.5 rounded-full bg-primary/20 text-primary text-label-sm whitespace-nowrap transition-all border border-primary/30"
-                    : "px-4 py-1.5 rounded-full border border-outline-variant/50 text-on-surface-variant hover:text-on-surface text-label-sm whitespace-nowrap transition-all"
+                    ? "px-4 py-1.5 rounded-full bg-primary/20 text-primary text-label-sm whitespace-nowrap transition-all border border-primary/30 flex items-center gap-1.5"
+                    : "px-4 py-1.5 rounded-full border border-outline-variant/50 text-on-surface-variant hover:text-on-surface text-label-sm whitespace-nowrap transition-all flex items-center gap-1.5"
                 }
               >
+                <span aria-hidden="true">{getServiceTypeEmoji(type)}</span>
                 {type}
               </button>
             ))}

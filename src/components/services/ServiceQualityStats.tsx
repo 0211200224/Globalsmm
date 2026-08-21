@@ -5,23 +5,21 @@ import { useTranslations } from "@/lib/i18n/I18nProvider";
 import { formatMessage } from "@/lib/i18n/format-message";
 
 type Props = {
-  service: Pick<CatalogService, "qualityScore" | "retentionPercent" | "refillDays" | "speedLabel">;
+  service: Pick<CatalogService, "retentionPercent" | "refillDays" | "speedLabel">;
 };
 
 /**
  * The "trust box" shown on service cards and in the order modal so buyers
- * can see quality/speed/retention/refill before they pay — matches the
- * transparency competitors like 5SMM lead with. qualityScore and
- * retentionPercent are optional (admin-set); a service that hasn't been
- * rated yet just shows fewer tiles instead of a fake number.
+ * can see speed/retention/refill before they pay — matches the transparency
+ * competitors like 5SMM lead with. qualityScore now renders separately at
+ * the top of ServiceCard (more prominent), so it's no longer one of these
+ * tiles. retentionPercent is optional (admin-set); a service that hasn't
+ * been rated yet just shows fewer tiles instead of a fake number.
  */
 export function ServiceQualityStats({ service }: Props) {
   const t = useTranslations().marketplace;
   const stats: { icon: string; label: string; value: string }[] = [];
 
-  if (service.qualityScore != null) {
-    stats.push({ icon: "star", label: t.quality, value: `${service.qualityScore.toFixed(1)}/10` });
-  }
   stats.push({ icon: "bolt", label: t.avgStart, value: service.speedLabel });
   if (service.retentionPercent != null) {
     stats.push({ icon: "trending_up", label: t.retention, value: `${service.retentionPercent}%` });

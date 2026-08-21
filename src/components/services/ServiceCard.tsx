@@ -2,7 +2,9 @@
 
 import type { CatalogService } from "@/lib/types/catalog";
 import { ServiceQualityStats } from "./ServiceQualityStats";
+import { QualityBadge } from "./QualityBadge";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { getServiceTypeEmoji } from "@/lib/services/type-emoji";
 
 const badgeStyles: Record<string, string> = {
   Hot: "bg-tertiary-container text-on-tertiary-container",
@@ -22,22 +24,26 @@ export function ServiceCard({
   return (
     <div className="glass-card p-6 rounded-xl flex flex-col justify-between group hover:shadow-xl hover:border-secondary/20 transition-all duration-300">
       <div>
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start mb-3">
           <div className="p-2 rounded-lg bg-surface-container-highest text-secondary">
             <span className="material-symbols-outlined">{service.icon}</span>
           </div>
-          {service.badge && (
-            <span
-              className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${badgeStyles[service.badge] ?? badgeStyles.Stable}`}
-            >
-              {service.badge}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <QualityBadge qualityScore={service.qualityScore} />
+            {service.badge && (
+              <span
+                className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ${badgeStyles[service.badge] ?? badgeStyles.Stable}`}
+              >
+                {service.badge}
+              </span>
+            )}
+          </div>
         </div>
         <p className="text-[11px] text-on-surface-variant/70 uppercase tracking-wider font-bold mb-1">
           {service.categoryName} · {service.serviceType}
         </p>
-        <h3 className="text-headline-md mb-2 group-hover:text-secondary transition-colors">
+        <h3 className="text-headline-md mb-2 group-hover:text-secondary transition-colors flex items-center gap-2">
+          <span aria-hidden="true">{getServiceTypeEmoji(service.serviceType)}</span>
           {service.name}
         </h3>
         <p className="text-body-sm text-on-surface-variant line-clamp-2 mb-6">
