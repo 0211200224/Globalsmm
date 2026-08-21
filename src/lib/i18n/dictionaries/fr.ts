@@ -269,7 +269,7 @@ const fr: Dictionary = {
     orders: {
       title: "Commandes",
       subtitle:
-        "Approuvez les commandes en attente ci-dessous pour les envoyer à un fournisseur (ou marquez-les En cours pour un traitement manuel). Annuler ou rembourser crédite automatiquement le portefeuille du client.",
+        "Les commandes avec un fournisseur associé sont envoyées automatiquement à la commande. Mettez à jour le statut manuellement pour les services manuels, ou annulez/remboursez pour créditer automatiquement le portefeuille du client.",
       colOrder: "Commande",
       colCustomer: "Client",
       colDate: "Date",

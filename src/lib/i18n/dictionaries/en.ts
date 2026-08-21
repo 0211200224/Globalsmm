@@ -270,7 +270,7 @@ const en = {
     orders: {
       title: "Orders",
       subtitle:
-        "Approve pending orders below to dispatch them to a provider (or mark them Processing for manual fulfillment). Canceling or refunding credits the customer's wallet automatically.",
+        "Orders with a mapped provider dispatch automatically on checkout. Update status by hand for manual services, or cancel/refund to credit the customer's wallet automatically.",
       colOrder: "Order",
       colCustomer: "Customer",
       colDate: "Date",

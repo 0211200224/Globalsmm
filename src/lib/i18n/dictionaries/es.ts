@@ -269,7 +269,7 @@ const es: Dictionary = {
     orders: {
       title: "Pedidos",
       subtitle:
-        "Aprueba los pedidos pendientes abajo para despacharlos a un proveedor (o márcalos como Procesando para atención manual). Cancelar o reembolsar acredita la cartera del cliente automáticamente.",
+        "Los pedidos con proveedor asignado se despachan automáticamente al finalizar la compra. Actualiza el estado manualmente para servicios manuales, o cancela/reembolsa para acreditar la cartera del cliente automáticamente.",
       colOrder: "Pedido",
       colCustomer: "Cliente",
       colDate: "Fecha",

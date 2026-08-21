@@ -269,7 +269,7 @@ const pt: Dictionary = {
     orders: {
       title: "Pedidos",
       subtitle:
-        "Aprove os pedidos pendentes abaixo pra despachá-los a um provedor (ou marque como Processando pra atendimento manual). Cancelar ou reembolsar credita a carteira do cliente automaticamente.",
+        "Pedidos com provedor mapeado são despachados automaticamente no checkout. Atualize o status manualmente pra serviços manuais, ou cancele/reembolse pra creditar a carteira do cliente automaticamente.",
       colOrder: "Pedido",
       colCustomer: "Cliente",
       colDate: "Data",
