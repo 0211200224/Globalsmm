@@ -11,11 +11,24 @@ const FALLBACK_URL = "https://latest.currency-api.pages.dev/v1/currencies/usd.js
 // Rates go stale in this path, never absent.
 const HARDCODED_FALLBACK: Record<CurrencyCode, number> = {
   USD: 1,
-  XAF: 561.54,
-  MZN: 63.81,
   EUR: 0.856,
   GBP: 0.735,
   BRL: 5.178,
+  XAF: 561.54,
+  XOF: 561.54,
+  MZN: 63.81,
+  AOA: 912,
+  NGN: 1550,
+  GHS: 15.5,
+  KES: 129,
+  ZAR: 18.3,
+  UGX: 3700,
+  INR: 83.5,
+  MXN: 17.5,
+  ARS: 1050,
+  COP: 4050,
+  CAD: 1.36,
+  AUD: 1.52,
 };
 
 async function fetchRates(url: string): Promise<Record<CurrencyCode, number> | null> {
