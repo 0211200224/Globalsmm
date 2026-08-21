@@ -37,18 +37,25 @@ const ARCS: [number, number][] = [
   [0, 2], [1, 5], [3, 7], [4, 8], [6, 9],
 ];
 
+// Positions are deliberately conservative on both X and Z: this canvas
+// sits in a narrow, roughly-square panel (not a wide hero banner), and a
+// badge's screen-space projection grows fast as Z approaches the camera
+// (z=6.2) -- the original pass placed TikTok/Telegram at z=0.6/0.8, which
+// pushed them past the edge of the frame entirely. Every position here
+// was verified with a real screenshot (see the /login page) to land
+// fully inside the visible panel.
 const PLATFORM_BADGES = [
-  { Icon: SiInstagram, color: SiInstagramHex, label: "Instagram", pos: [-2.9, 1.5, 0.4] },
-  { Icon: SiTiktok, color: SiTiktokHex, label: "TikTok", pos: [2.9, -1.4, 0.6] },
+  { Icon: SiInstagram, color: SiInstagramHex, label: "Instagram", pos: [-2.9, 1.5, 0.2] },
+  { Icon: SiTiktok, color: SiTiktokHex, label: "TikTok", pos: [2.6, -1.4, -0.2] },
   { Icon: SiYoutube, color: SiYoutubeHex, label: "YouTube", pos: [2.7, 1.7, -0.3] },
-  { Icon: SiFacebook, color: SiFacebookHex, label: "Facebook", pos: [-2.8, -1.3, -0.4] },
-  { Icon: SiTelegram, color: SiTelegramHex, label: "Telegram", pos: [-3.1, 0.1, 0.8] },
-  { Icon: SiX, color: SiXHex, label: "X", pos: [3.1, 0.2, -0.7] },
+  { Icon: SiFacebook, color: SiFacebookHex, label: "Facebook", pos: [-2.8, -1.3, -0.2] },
+  { Icon: SiTelegram, color: SiTelegramHex, label: "Telegram", pos: [-2.6, 0.0, -0.2] },
+  { Icon: SiX, color: SiXHex, label: "X", pos: [3.0, 0.3, -0.5] },
 ] as const;
 
 const DASHBOARD_CARDS = [
-  { title: "Campaign", value: "+248%", points: "0,20 10,14 20,17 30,8 40,11 50,2", pos: [-3.4, -0.3, 1.1] },
-  { title: "New Followers", value: "12.4k", points: "0,18 10,15 20,16 30,9 40,10 50,4", pos: [3.3, 0.6, 1.2] },
+  { title: "Campaign", value: "+248%", points: "0,20 10,14 20,17 30,8 40,11 50,2", pos: [-1.7, -2.1, 0] },
+  { title: "New Followers", value: "12.4k", points: "0,18 10,15 20,16 30,9 40,10 50,4", pos: [1.7, 2.1, 0] },
 ] as const;
 
 function Dots() {
@@ -189,7 +196,12 @@ function PlatformBadge({ Icon, color, label, pos }: (typeof PLATFORM_BADGES)[num
           className="w-11 h-11 rounded-2xl border border-white/15 bg-[#151233]/70 backdrop-blur-md flex items-center justify-center shadow-lg select-none pointer-events-none"
           style={{ boxShadow: `0 0 18px -2px ${color}88` }}
         >
-          <Icon color={color} size={20} aria-label={label} />
+          {/* Fixed light backdrop behind the glyph itself -- some brand
+              colors (TikTok is pure black) would otherwise disappear
+              against the dark glass chip. */}
+          <div className="w-7 h-7 rounded-full bg-white/95 flex items-center justify-center">
+            <Icon color={color} size={16} aria-label={label} />
+          </div>
         </div>
       </Html>
     </Float>
