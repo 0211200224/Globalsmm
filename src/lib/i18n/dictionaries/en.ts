@@ -40,6 +40,22 @@ const en = {
     viewDocs: "View Documentation",
     footerTagline:
       "The infrastructure layer for the modern social economy. Reliable, scalable, and secure.",
+    platformsTitle: "Pick a platform",
+    platformsSubtitle: "Tap one to jump straight to its services.",
+    whyFastTitle: "Fast",
+    whyFastDesc: "Most orders start within minutes of checkout.",
+    whySecureTitle: "Secure",
+    whySecureDesc: "Encrypted payments and accounts, always.",
+    whyGlobalTitle: "Global",
+    whyGlobalDesc: "18+ currencies and 4 languages, built in.",
+    ambassadorTitle: "Ambassador Program",
+    ambassadorDesc:
+      "Earn 5% recurring commission on every order your referrals place, for life.",
+    ambassadorCta: "Join Program",
+    apiTitle: "API Integration",
+    apiDesc: "A clean REST API for white-labeling and automated ordering.",
+    apiCta: "Developer Docs",
+    globalCurrenciesNote: "18+ currencies, converted automatically",
   },
   auth: {
     login: {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { HeaderControls } from "@/components/layout/HeaderControls";
 
 export function MarketingHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -41,10 +42,8 @@ export function MarketingHeader() {
             {t.navSupport}
           </a>
         </nav>
-        <div className="flex items-center gap-4">
-          <span className="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">
-            notifications
-          </span>
+        <div className="flex items-center gap-1 sm:gap-3">
+          <HeaderControls />
           <Link
             href="/login"
             className="beveled-button bg-secondary-container text-on-secondary-container px-5 py-2 rounded-lg text-label-md active:scale-95 transition-all"

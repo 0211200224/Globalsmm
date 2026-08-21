@@ -39,6 +39,22 @@ const es: Dictionary = {
     viewDocs: "Ver Documentación",
     footerTagline:
       "La capa de infraestructura para la economía social moderna. Confiable, escalable y segura.",
+    platformsTitle: "Elige una plataforma",
+    platformsSubtitle: "Toca una para ir directo a sus servicios.",
+    whyFastTitle: "Rápido",
+    whyFastDesc: "La mayoría de los pedidos comienzan minutos después de la compra.",
+    whySecureTitle: "Seguro",
+    whySecureDesc: "Pagos y cuentas siempre cifrados.",
+    whyGlobalTitle: "Global",
+    whyGlobalDesc: "Más de 18 monedas y 4 idiomas, integrados.",
+    ambassadorTitle: "Programa de Embajadores",
+    ambassadorDesc:
+      "Gana 5% de comisión recurrente en cada pedido de tus referidos, de por vida.",
+    ambassadorCta: "Unirme",
+    apiTitle: "Integración de API",
+    apiDesc: "Una API REST limpia para white-label y pedidos automatizados.",
+    apiCta: "Documentación",
+    globalCurrenciesNote: "Más de 18 monedas, convertidas automáticamente",
   },
   auth: {
     login: {

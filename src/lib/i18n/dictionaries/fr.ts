@@ -39,6 +39,22 @@ const fr: Dictionary = {
     viewDocs: "Voir la Documentation",
     footerTagline:
       "La couche d'infrastructure pour l'économie sociale moderne. Fiable, évolutive et sécurisée.",
+    platformsTitle: "Choisissez une plateforme",
+    platformsSubtitle: "Touchez-en une pour aller directement à ses services.",
+    whyFastTitle: "Rapide",
+    whyFastDesc: "La plupart des commandes démarrent en quelques minutes.",
+    whySecureTitle: "Sécurisé",
+    whySecureDesc: "Paiements et comptes toujours chiffrés.",
+    whyGlobalTitle: "Mondial",
+    whyGlobalDesc: "Plus de 18 devises et 4 langues, intégrées.",
+    ambassadorTitle: "Programme Ambassadeur",
+    ambassadorDesc:
+      "Gagnez 5 % de commission récurrente sur chaque commande de vos filleuls, à vie.",
+    ambassadorCta: "Rejoindre",
+    apiTitle: "Intégration API",
+    apiDesc: "Une API REST claire pour la marque blanche et les commandes automatisées.",
+    apiCta: "Documentation",
+    globalCurrenciesNote: "Plus de 18 devises, converties automatiquement",
   },
   auth: {
     login: {
