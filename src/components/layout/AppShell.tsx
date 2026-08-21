@@ -5,7 +5,7 @@ import { TopBar } from "./TopBar";
 import { BottomNav } from "./BottomNav";
 import { NotificationBell } from "./NotificationBell";
 import { getCurrentUser } from "@/lib/actions/current-user";
-import { getMyNotifications } from "@/lib/actions/notifications";
+import { getMyNotifications } from "@/lib/notifications-core";
 import { createClient } from "@/lib/supabase/server";
 
 type AppShellProps = {

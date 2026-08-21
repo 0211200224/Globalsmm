@@ -7,7 +7,7 @@ import { getStripe } from "@/lib/stripe";
 import { initiatePay } from "@/lib/fapshi";
 import { getRates } from "@/lib/currency/get-rates";
 import { reconcileFapshiTransaction } from "@/lib/fapshi-reconcile";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 
 const MIN_DEPOSIT_USD = 5;
 const MAX_DEPOSIT_USD = 10000;

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 import type { FapshiPaymentStatus } from "@/lib/fapshi";
 
 /**

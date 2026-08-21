@@ -2,7 +2,7 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 import { createCommissionForOrder, settleCommissionForOrder } from "@/lib/actions/affiliate";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 import { getProviderClient } from "@/lib/fulfillment/get-provider-client";
 import { getEffectiveDiscountPercent } from "@/lib/vip";
 import type { Order, Prisma } from "@/generated/prisma/client";

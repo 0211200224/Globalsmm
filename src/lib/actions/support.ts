@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 import type { TicketStatus } from "@/generated/prisma/client";
 
 async function getRequester() {

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 
 /**
  * Credits the Wallet once a deposit Checkout Session completes. Stripe

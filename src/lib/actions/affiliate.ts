@@ -3,7 +3,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { MIN_WITHDRAWAL_USD } from "@/lib/constants";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 import { formatUSD } from "@/lib/format";
 
 function slugify(input: string) {

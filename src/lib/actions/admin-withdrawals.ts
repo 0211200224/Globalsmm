@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { assertIsAdmin } from "@/lib/actions/admin-guard";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 import { formatUSD } from "@/lib/format";
 import type { WithdrawalStatus } from "@/generated/prisma/client";
 

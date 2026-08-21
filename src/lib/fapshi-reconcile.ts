@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { getPaymentStatus } from "@/lib/fapshi";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 
 /**
  * Core reconciliation logic, deliberately NOT in a "use server" file --

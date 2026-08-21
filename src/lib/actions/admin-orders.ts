@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { settleCommissionForOrder } from "@/lib/actions/affiliate";
 import { assertIsAdmin } from "@/lib/actions/admin-guard";
-import { createNotification } from "@/lib/actions/notifications";
+import { createNotification } from "@/lib/notifications-core";
 import { getProviderClient } from "@/lib/fulfillment/get-provider-client";
 import { refundOrder } from "@/lib/order-core";
 import type { OrderRowStatus } from "@/lib/types/orders";

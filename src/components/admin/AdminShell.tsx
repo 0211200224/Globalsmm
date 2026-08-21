@@ -4,7 +4,7 @@ import { AdminMobileNav } from "./AdminMobileNav";
 import { TopBar } from "@/components/layout/TopBar";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { getCurrentUser } from "@/lib/actions/current-user";
-import { getMyNotifications } from "@/lib/actions/notifications";
+import { getMyNotifications } from "@/lib/notifications-core";
 import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 type AdminShellProps = {
