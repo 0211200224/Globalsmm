@@ -39,42 +39,42 @@ export function HeaderControls() {
         type="button"
         aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-colors"
+        className="p-2 text-on-surface-variant hover:bg-surface-container-highest/20 rounded-full transition-colors shrink-0"
       >
         <span className="material-symbols-outlined text-[20px]">
           {theme === "dark" ? "light_mode" : "dark_mode"}
         </span>
       </button>
-      <div className="relative flex items-center">
-        <span className="material-symbols-outlined text-[18px] text-on-surface-variant pointer-events-none absolute left-2">
+      <div className="relative flex items-center" title={LOCALE_LABELS[locale]}>
+        <span className="material-symbols-outlined text-[18px] text-on-surface-variant pointer-events-none absolute left-2 hidden sm:inline-block">
           language
         </span>
         <select
           aria-label="Language"
           value={locale}
           onChange={(e) => handleLanguageChange(e.target.value as Locale)}
-          className="bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pl-8 pr-2 py-2 hover:bg-surface-container-highest/20 rounded-full transition-colors"
+          className="w-12 sm:w-20 bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pl-2 sm:pl-8 pr-1 sm:pr-2 py-2 hover:bg-surface-container-highest/20 rounded-full transition-colors shrink-0"
         >
           {SUPPORTED_LOCALES.map((code) => (
             <option key={code} value={code} className="text-on-surface bg-surface-container">
-              {LOCALE_LABELS[code]}
+              {code.toUpperCase()}
             </option>
           ))}
         </select>
       </div>
-      <div className="relative flex items-center">
-        <span className="material-symbols-outlined text-[18px] text-on-surface-variant pointer-events-none absolute left-2">
+      <div className="relative flex items-center" title={CURRENCY_LABELS[currency]}>
+        <span className="material-symbols-outlined text-[18px] text-on-surface-variant pointer-events-none absolute left-2 hidden sm:inline-block">
           payments
         </span>
         <select
           aria-label="Currency"
           value={currency}
           onChange={(e) => handleCurrencyChange(e.target.value as CurrencyCode)}
-          className="bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pl-8 pr-2 py-2 hover:bg-surface-container-highest/20 rounded-full transition-colors"
+          className="w-12 sm:w-20 bg-transparent border-none text-label-sm text-on-surface-variant focus:ring-0 cursor-pointer appearance-none pl-2 sm:pl-8 pr-1 sm:pr-2 py-2 hover:bg-surface-container-highest/20 rounded-full transition-colors shrink-0"
         >
           {SUPPORTED_CURRENCIES.map((code) => (
             <option key={code} value={code} className="text-on-surface bg-surface-container">
-              {code} — {CURRENCY_LABELS[code]}
+              {code}
             </option>
           ))}
         </select>

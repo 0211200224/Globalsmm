@@ -18,10 +18,10 @@ export function TopBar({
   notificationSlot,
 }: TopBarProps) {
   return (
-    <header className="sticky top-0 w-full z-40 bg-surface/70 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center h-16 px-margin-x-mobile md:px-margin-x">
-      <div className="flex items-center flex-1 max-w-xl">
+    <header className="sticky top-0 w-full z-40 bg-surface/70 backdrop-blur-md border-b border-outline-variant/10 flex justify-between items-center h-16 px-margin-x-mobile md:px-margin-x gap-1 sm:gap-2">
+      <div className="flex items-center min-w-0 flex-1 md:max-w-xl">
         {leftSlot}
-        <div className="relative w-full group">
+        <div className="relative w-full group hidden md:block">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
             search
           </span>
@@ -32,8 +32,8 @@ export function TopBar({
           />
         </div>
       </div>
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1 sm:gap-3 md:gap-6 shrink-0">
+        <div className="flex items-center gap-0.5 sm:gap-2 md:gap-4">
           <HeaderControls />
           {notificationSlot}
           <Link
