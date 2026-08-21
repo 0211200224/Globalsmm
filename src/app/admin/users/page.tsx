@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { getVipTier } from "@/lib/vip";
 import { getCurrentUser } from "@/lib/actions/current-user";
 import { UsersView, type AdminUserRow } from "./UsersView";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 export default async function AdminUsersPage() {
+  const { admin: t } = await getDictionary();
   // getCurrentUser() is wrapped in React's cache() (see current-user.ts), so
   // this resolves from memory rather than a fresh round trip — AdminShell
   // calls it too within the same request. AdminLayout has already verified
@@ -50,9 +52,9 @@ export default async function AdminUsersPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Users</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.users.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Gerencie contas, saldo e acesso dos usuários.
+          {t.users.subtitle}
         </p>
       </div>
 

@@ -4,8 +4,10 @@ import { formatUSD } from "@/lib/format";
 import type { OrderRowStatus } from "@/lib/types/orders";
 import { AdminOrdersView, type AdminOrderRow } from "./AdminOrdersView";
 import { PendingApprovalQueue, type PendingApprovalRow } from "@/components/admin/PendingApprovalQueue";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 export default async function AdminOrdersPage() {
+  const { admin: t } = await getDictionary();
   const [dbOrders, pendingOrders, providers] = await Promise.all([
     prisma.order.findMany({
       where: { status: { not: "PENDING_ADMIN" } },
@@ -66,11 +68,9 @@ export default async function AdminOrdersPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Orders</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.orders.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Approve pending orders below to dispatch them to a provider (or mark them
-          Processing for manual fulfillment). Canceling or refunding credits the
-          customer&apos;s wallet automatically.
+          {t.orders.subtitle}
         </p>
       </div>
 

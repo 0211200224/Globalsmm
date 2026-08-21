@@ -2,8 +2,10 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
 import { WithdrawalsView, type AdminWithdrawalRow } from "./WithdrawalsView";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 export default async function AdminWithdrawalsPage() {
+  const { admin: t } = await getDictionary();
   const dbWithdrawals = await prisma.referralWithdrawal.findMany({
     include: { affiliate: { include: { user: true } } },
     orderBy: { createdAt: "desc" },
@@ -26,10 +28,9 @@ export default async function AdminWithdrawalsPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Withdrawals</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.withdrawals.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Referral commission payout requests. Marking as Paid settles the
-          underlying commissions.
+          {t.withdrawals.subtitle}
         </p>
       </div>
 

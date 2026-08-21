@@ -11,6 +11,8 @@ import {
   adjustWalletBalance,
 } from "@/lib/actions/admin-users";
 import { formatUSD } from "@/lib/format";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export type AdminUserRow = {
   id: string;
@@ -33,6 +35,7 @@ export function UsersView({
   currentAdminId: string;
 }) {
   const router = useRouter();
+  const t = useTranslations().admin.users;
   const [query, setQuery] = useState("");
   const [adjustingId, setAdjustingId] = useState<string | null>(null);
 
@@ -58,7 +61,8 @@ export function UsersView({
 
   async function handleToggleRole(user: AdminUserRow) {
     const nextRole = user.role === "ADMIN" ? "USER" : "ADMIN";
-    if (!confirm(`${nextRole === "ADMIN" ? "Grant" : "Remove"} admin access for ${user.name}?`)) {
+    const action = nextRole === "ADMIN" ? t.grantAction : t.removeAction;
+    if (!confirm(formatMessage(t.roleConfirm, { action, name: user.name }))) {
       return;
     }
     const result = await setUserRole(user.id, nextRole);
@@ -71,7 +75,7 @@ export function UsersView({
 
   async function handleAdjustBalance(user: AdminUserRow) {
     const input = prompt(
-      `Adjust wallet for ${user.name} (current: ${formatUSD(user.walletBalance)}).\nEnter amount (use a negative number to debit):`,
+      formatMessage(t.adjustPrompt, { name: user.name, balance: formatUSD(user.walletBalance) }),
     );
     if (input === null) return;
     const amount = Number(input);
@@ -87,7 +91,7 @@ export function UsersView({
 
   const columns: DataTableColumn<AdminUserRow>[] = [
     {
-      header: "User",
+      header: t.colUser,
       render: (row) => (
         <div>
           <p className="text-body-sm font-medium text-on-surface">
@@ -100,18 +104,18 @@ export function UsersView({
       ),
     },
     {
-      header: "Role / Tier",
+      header: t.colRoleTier,
       render: (row) => (
         <div className="flex flex-wrap items-center gap-1.5">
           <Pill tone={row.role === "ADMIN" ? "info" : "neutral"}>
-            {row.role === "ADMIN" ? "Admin" : row.vipTierName}
+            {row.role === "ADMIN" ? t.adminPill : row.vipTierName}
           </Pill>
-          {row.isReseller && <Pill tone="warning">Reseller</Pill>}
+          {row.isReseller && <Pill tone="warning">{t.reseller}</Pill>}
         </div>
       ),
     },
     {
-      header: "Lifetime Spend",
+      header: t.colLifetimeSpend,
       render: (row) => (
         <span className="font-mono text-on-surface-variant">
           {formatUSD(row.lifetimeSpend)}
@@ -119,24 +123,24 @@ export function UsersView({
       ),
     },
     {
-      header: "Wallet",
+      header: t.colWallet,
       render: (row) => (
         <span className="font-mono font-bold text-on-surface">
           {formatUSD(row.walletBalance)}
         </span>
       ),
     },
-    { header: "Joined", render: (row) => row.joinedAtLabel },
+    { header: t.colJoined, render: (row) => row.joinedAtLabel },
     {
-      header: "Status",
+      header: t.colStatus,
       render: (row) => (
         <Pill tone={row.blocked ? "negative" : "positive"}>
-          {row.blocked ? "Blocked" : "Active"}
+          {row.blocked ? t.blocked : t.active}
         </Pill>
       ),
     },
     {
-      header: "Actions",
+      header: t.colActions,
       align: "right",
       render: (row) => (
         <div className="flex justify-end gap-2">
@@ -146,7 +150,7 @@ export function UsersView({
             onClick={() => handleAdjustBalance(row)}
             className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors disabled:opacity-50"
           >
-            Adjust Balance
+            {t.adjustBalance}
           </button>
           <button
             type="button"
@@ -158,7 +162,7 @@ export function UsersView({
                 : "px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             }
           >
-            {row.role === "ADMIN" ? "Remove Admin" : "Make Admin"}
+            {row.role === "ADMIN" ? t.removeAdmin : t.makeAdmin}
           </button>
           <button
             type="button"
@@ -169,7 +173,7 @@ export function UsersView({
                 : "px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
             }
           >
-            {row.isReseller ? "Remove Reseller" : "Make Reseller"}
+            {row.isReseller ? t.removeReseller : t.makeReseller}
           </button>
           <button
             type="button"
@@ -180,7 +184,7 @@ export function UsersView({
                 : "px-3 py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 text-label-sm transition-colors"
             }
           >
-            {!row.blocked ? "Block" : "Unblock"}
+            {!row.blocked ? t.block : t.unblock}
           </button>
         </div>
       ),
@@ -189,11 +193,11 @@ export function UsersView({
 
   return (
     <DataTable
-      title={`${filtered.length} usuários`}
+      title={formatMessage(t.tableTitle, { count: filtered.length })}
       action={
         <input
           className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-label-sm px-4 py-1.5 focus:ring-1 focus:ring-tertiary w-56"
-          placeholder="Search by name or email..."
+          placeholder={t.searchPlaceholder}
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}

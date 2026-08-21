@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProvider, updateProvider, type ProviderInput } from "@/lib/actions/admin-providers";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export type EditableProvider = {
   id: string;
@@ -18,6 +19,7 @@ export function ProviderFormModal({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations().admin.providers;
   const [form, setForm] = useState<ProviderInput>({
     name: existing?.name ?? "",
     apiUrl: existing?.apiUrl ?? "",
@@ -53,12 +55,12 @@ export function ProviderFormModal({
       <div className="glass-panel bg-surface-container-low border border-white/10 rounded-2xl w-full max-w-lg p-6 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start mb-6">
           <h3 className="text-headline-md text-on-surface">
-            {existing ? "Edit Provider" : "New Provider"}
+            {existing ? t.editTitle : t.newTitle}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.close}
             className="p-2 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container-high transition-all"
           >
             <span className="material-symbols-outlined">close</span>
@@ -73,30 +75,30 @@ export function ProviderFormModal({
 
         <form onSubmit={handleSubmit} className="space-y-gutter">
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Name</label>
+            <label className="text-label-sm text-on-surface-variant">{t.nameLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="e.g. SocialBoost Panel"
+              placeholder={t.namePlaceholder}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">API URL</label>
+            <label className="text-label-sm text-on-surface-variant">{t.apiUrlLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40 font-mono text-sm"
               value={form.apiUrl}
               onChange={(e) => setForm({ ...form, apiUrl: e.target.value })}
-              placeholder="https://provider.example/api/v2"
+              placeholder={t.apiUrlPlaceholder}
               required
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              API Key {existing && "(leave blank to keep the current one)"}
+              {t.apiKeyLabel} {existing && t.apiKeyKeepHint}
             </label>
             <input
               type="password"
@@ -114,14 +116,14 @@ export function ProviderFormModal({
               onClick={onClose}
               className="px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors"
             >
-              Cancel
+              {t.cancel}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-6 py-2 rounded-lg bg-tertiary text-on-tertiary font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
             >
-              {loading ? "Saving..." : existing ? "Save Changes" : "Create Provider"}
+              {loading ? t.saving : existing ? t.saveChanges : t.createProvider}
             </button>
           </div>
         </form>

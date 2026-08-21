@@ -4,9 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { adminNavItems } from "./nav-items";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export function AdminMobileNav() {
   const pathname = usePathname();
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
 
   return (
@@ -42,7 +44,7 @@ export function AdminMobileNav() {
                     GlobalSMM
                   </h1>
                   <p className="text-label-sm text-tertiary font-bold uppercase tracking-widest">
-                    Admin
+                    {t.admin.shellBadge}
                   </p>
                 </div>
               </div>
@@ -74,7 +76,7 @@ export function AdminMobileNav() {
                     }
                   >
                     <span className="material-symbols-outlined">{item.icon}</span>
-                    <span className="text-label-md">{item.label}</span>
+                    <span className="text-label-md">{t.admin.nav[item.labelKey]}</span>
                   </Link>
                 );
               })}
@@ -89,7 +91,7 @@ export function AdminMobileNav() {
                 <span className="material-symbols-outlined text-[20px]">
                   arrow_back
                 </span>
-                Exit Admin
+                {t.nav.exitAdmin}
               </Link>
             </div>
           </aside>

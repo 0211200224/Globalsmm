@@ -2,8 +2,10 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
 import { PaymentsView, type AdminTransactionRow } from "./PaymentsView";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 export default async function AdminPaymentsPage() {
+  const { admin: t } = await getDictionary();
   const dbTransactions = await prisma.transaction.findMany({
     include: { wallet: { include: { user: true } } },
     orderBy: { createdAt: "desc" },
@@ -29,11 +31,9 @@ export default async function AdminPaymentsPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Payments</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.payments.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Full wallet transaction ledger (deposits, debits, refunds, manual
-          adjustments). Deposit approval will apply here once Stripe is
-          connected — see PLANO.md.
+          {t.payments.subtitle}
         </p>
       </div>
 

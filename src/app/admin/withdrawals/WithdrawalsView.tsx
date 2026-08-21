@@ -6,6 +6,8 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { Pill } from "@/components/ui/Pill";
 import { setWithdrawalStatus } from "@/lib/actions/admin-withdrawals";
 import type { WithdrawalStatus } from "@/generated/prisma/client";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export type AdminWithdrawalRow = {
   id: string;
@@ -25,7 +27,15 @@ const statusTone: Record<WithdrawalStatus, "warning" | "positive" | "negative" |
 
 export function WithdrawalsView({ withdrawals }: { withdrawals: AdminWithdrawalRow[] }) {
   const router = useRouter();
+  const t = useTranslations().admin.withdrawals;
   const [isPending, startTransition] = useTransition();
+
+  const statusLabels: Record<WithdrawalStatus, string> = {
+    PENDING: t.statusPending,
+    APPROVED: t.statusApproved,
+    PAID: t.statusPaid,
+    REJECTED: t.statusRejected,
+  };
 
   function handleAction(id: string, status: WithdrawalStatus) {
     startTransition(async () => {
@@ -40,7 +50,7 @@ export function WithdrawalsView({ withdrawals }: { withdrawals: AdminWithdrawalR
 
   const columns: DataTableColumn<AdminWithdrawalRow>[] = [
     {
-      header: "Affiliate",
+      header: t.colAffiliate,
       render: (row) => (
         <div>
           <p className="text-body-sm font-medium text-on-surface">
@@ -52,20 +62,20 @@ export function WithdrawalsView({ withdrawals }: { withdrawals: AdminWithdrawalR
         </div>
       ),
     },
-    { header: "Requested", render: (row) => row.createdAtLabel },
+    { header: t.colRequested, render: (row) => row.createdAtLabel },
     {
-      header: "Amount",
+      header: t.colAmount,
       align: "right",
       render: (row) => (
         <span className="font-mono font-bold text-on-surface">{row.amount}</span>
       ),
     },
     {
-      header: "Status",
-      render: (row) => <Pill tone={statusTone[row.status]}>{row.status}</Pill>,
+      header: t.colStatus,
+      render: (row) => <Pill tone={statusTone[row.status]}>{statusLabels[row.status]}</Pill>,
     },
     {
-      header: "Actions",
+      header: t.colActions,
       align: "right",
       render: (row) =>
         row.status === "PENDING" || row.status === "APPROVED" ? (
@@ -77,7 +87,7 @@ export function WithdrawalsView({ withdrawals }: { withdrawals: AdminWithdrawalR
                 onClick={() => handleAction(row.id, "APPROVED")}
                 className="px-3 py-1.5 rounded-lg border border-primary/30 text-primary hover:bg-primary/10 text-label-sm transition-colors disabled:opacity-50"
               >
-                Approve
+                {t.approve}
               </button>
             )}
             <button
@@ -86,7 +96,7 @@ export function WithdrawalsView({ withdrawals }: { withdrawals: AdminWithdrawalR
               onClick={() => handleAction(row.id, "PAID")}
               className="px-3 py-1.5 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 text-label-sm transition-colors disabled:opacity-50"
             >
-              Mark Paid
+              {t.markPaid}
             </button>
             <button
               type="button"
@@ -94,22 +104,22 @@ export function WithdrawalsView({ withdrawals }: { withdrawals: AdminWithdrawalR
               onClick={() => handleAction(row.id, "REJECTED")}
               className="px-3 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error/10 text-label-sm transition-colors disabled:opacity-50"
             >
-              Reject
+              {t.reject}
             </button>
           </div>
         ) : (
-          <span className="text-label-sm text-on-surface-variant/50">—</span>
+          <span className="text-label-sm text-on-surface-variant/50">{t.dash}</span>
         ),
     },
   ];
 
   return (
     <DataTable
-      title={`${withdrawals.length} withdrawal requests`}
+      title={formatMessage(t.tableTitle, { count: withdrawals.length })}
       columns={columns}
       rows={withdrawals}
       rowKey={(row) => row.id}
-      emptyMessage="No withdrawal requests yet."
+      emptyMessage={t.noWithdrawals}
     />
   );
 }

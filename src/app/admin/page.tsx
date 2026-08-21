@@ -4,10 +4,13 @@ import { Pill } from "@/components/ui/Pill";
 import { prisma } from "@/lib/prisma";
 import { formatUSD } from "@/lib/format";
 import { ACTIVE_ORDER_STATUSES } from "@/lib/types/orders";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 const LOW_BALANCE_THRESHOLD_USD = 20;
 
 export default async function AdminOverviewPage() {
+  const { admin: t } = await getDictionary();
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
@@ -32,7 +35,10 @@ export default async function AdminOverviewPage() {
       ? [
           {
             id: "pending-approvals",
-            label: `${pendingApprovals} order${pendingApprovals === 1 ? "" : "s"} waiting for approval`,
+            label:
+              pendingApprovals === 1
+                ? t.overview.pendingApprovalOne
+                : formatMessage(t.overview.pendingApprovalMany, { count: pendingApprovals }),
             href: "/admin/orders",
             icon: "pending_actions",
           },
@@ -40,7 +46,10 @@ export default async function AdminOverviewPage() {
       : []),
     ...lowBalanceProviders.map((p) => ({
       id: `low-balance-${p.id}`,
-      label: `${p.name} balance is low (${formatUSD(p.balance?.toNumber() ?? 0)})`,
+      label: formatMessage(t.overview.lowBalance, {
+        name: p.name,
+        amount: formatUSD(p.balance?.toNumber() ?? 0),
+      }),
       href: "/admin/providers",
       icon: "account_balance_wallet",
     })),
@@ -49,23 +58,23 @@ export default async function AdminOverviewPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Admin Overview</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.overview.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Live operational numbers.
+          {t.overview.subtitle}
         </p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-gutter">
-        <StatCard label="Total Users" value={totalUsers.toLocaleString("en-US")} icon="group" accent="primary" />
+        <StatCard label={t.overview.totalUsers} value={totalUsers.toLocaleString("en-US")} icon="group" accent="primary" />
         <StatCard
-          label="Revenue (month)"
+          label={t.overview.revenueMonth}
           value={formatUSD(revenueAgg._sum.amount?.toNumber() ?? 0)}
           icon="payments"
           accent="secondary"
         />
-        <StatCard label="Active Orders" value={activeOrders.toLocaleString("en-US")} icon="shopping_cart" accent="tertiary" />
+        <StatCard label={t.overview.activeOrders} value={activeOrders.toLocaleString("en-US")} icon="shopping_cart" accent="tertiary" />
         <StatCard
-          label="Pending Approvals"
+          label={t.overview.pendingApprovals}
           value={pendingApprovals.toLocaleString("en-US")}
           icon="pending_actions"
           accent="primary"
@@ -73,9 +82,9 @@ export default async function AdminOverviewPage() {
       </div>
 
       <div className="glass-panel rounded-xl p-stack-lg">
-        <h3 className="text-headline-md text-on-surface mb-stack-md">Needs Attention</h3>
+        <h3 className="text-headline-md text-on-surface mb-stack-md">{t.overview.needsAttention}</h3>
         {attentionQueue.length === 0 ? (
-          <p className="text-body-sm text-on-surface-variant">Nothing needs attention right now.</p>
+          <p className="text-body-sm text-on-surface-variant">{t.overview.nothingNeedsAttention}</p>
         ) : (
           <div className="space-y-3">
             {attentionQueue.map((item) => (
@@ -88,7 +97,7 @@ export default async function AdminOverviewPage() {
                   <span className="material-symbols-outlined text-tertiary">{item.icon}</span>
                   <span className="text-body-sm text-on-surface">{item.label}</span>
                 </div>
-                <Pill tone="warning">Review</Pill>
+                <Pill tone="warning">{t.overview.review}</Pill>
               </a>
             ))}
           </div>

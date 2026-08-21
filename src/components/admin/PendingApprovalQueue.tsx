@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { approveOrder, updateOrderStatus } from "@/lib/actions/admin-orders";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export type PendingApprovalRow = {
   id: string;
@@ -28,6 +30,8 @@ export function PendingApprovalQueue({
   providers: ProviderOption[];
 }) {
   const router = useRouter();
+  const tAdmin = useTranslations().admin;
+  const t = tAdmin.pendingQueue;
   const [isPending, startTransition] = useTransition();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [selectedProvider, setSelectedProvider] = useState<Record<string, string>>({});
@@ -50,12 +54,12 @@ export function PendingApprovalQueue({
   }
 
   function handleReject(row: PendingApprovalRow) {
-    if (!confirm(`Reject order ${row.orderCode} and refund the customer?`)) return;
+    if (!confirm(formatMessage(t.rejectConfirm, { code: row.orderCode }))) return;
     setBusyId(row.id);
     startTransition(async () => {
       const result = await updateOrderStatus(row.id, "CANCELED");
       setBusyId(null);
-      if (!result.success) alert(result.error ?? "Failed to reject order.");
+      if (!result.success) alert(result.error ?? tAdmin.orders.rejectFailed);
       router.refresh();
     });
   }
@@ -65,10 +69,10 @@ export function PendingApprovalQueue({
       <div className="glass-panel rounded-xl p-stack-lg border border-outline-variant/20">
         <h3 className="text-headline-md text-on-surface mb-1 flex items-center gap-2">
           <span className="material-symbols-outlined text-tertiary">pending_actions</span>
-          Approval Queue
+          {t.title}
         </h3>
         <p className="text-body-sm text-on-surface-variant">
-          Nothing waiting for review right now.
+          {t.empty}
         </p>
       </div>
     );
@@ -79,10 +83,10 @@ export function PendingApprovalQueue({
       <div className="flex items-center justify-between">
         <h3 className="text-headline-md text-on-surface flex items-center gap-2">
           <span className="material-symbols-outlined text-tertiary">pending_actions</span>
-          Approval Queue
+          {t.title}
         </h3>
         <span className="px-3 py-1 rounded-full text-label-sm font-bold bg-tertiary-container/40 text-tertiary">
-          {orders.length} waiting
+          {formatMessage(t.waitingBadge, { count: orders.length })}
         </span>
       </div>
 
@@ -110,11 +114,11 @@ export function PendingApprovalQueue({
                 </p>
                 <div className="flex items-center gap-4 pt-1">
                   <span className="text-body-sm">
-                    <span className="text-on-surface-variant">Charged: </span>
+                    <span className="text-on-surface-variant">{t.charged}</span>
                     <span className="font-bold text-secondary">{row.customerPrice}</span>
                   </span>
                   <span className="text-body-sm">
-                    <span className="text-on-surface-variant">Est. cost: </span>
+                    <span className="text-on-surface-variant">{t.estCost}</span>
                     <span className="font-bold text-on-surface">
                       {row.estimatedCost ?? "—"}
                     </span>
@@ -131,7 +135,7 @@ export function PendingApprovalQueue({
                     setSelectedProvider((prev) => ({ ...prev, [row.id]: e.target.value }))
                   }
                 >
-                  <option value="">Manual (no provider)</option>
+                  <option value="">{t.manualOption}</option>
                   {providers.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.name}
@@ -144,7 +148,7 @@ export function PendingApprovalQueue({
                   onClick={() => handleApprove(row)}
                   className="px-3 py-2 rounded-lg border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 text-label-sm transition-colors disabled:opacity-50"
                 >
-                  {busy ? "Working…" : "Approve"}
+                  {busy ? t.working : t.approve}
                 </button>
                 <button
                   type="button"
@@ -152,7 +156,7 @@ export function PendingApprovalQueue({
                   onClick={() => handleReject(row)}
                   className="px-3 py-2 rounded-lg border border-error/30 text-error hover:bg-error/10 text-label-sm transition-colors disabled:opacity-50"
                 >
-                  Reject
+                  {t.reject}
                 </button>
               </div>
             </div>

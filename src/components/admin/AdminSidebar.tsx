@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { adminNavItems } from "./nav-items";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[280px] z-50 border-r border-outline-variant/10 bg-surface-container-low flex-col py-stack-xl gap-stack-md">
@@ -23,7 +25,7 @@ export function AdminSidebar() {
             GlobalSMM
           </h1>
           <p className="text-label-sm text-tertiary font-bold uppercase tracking-widest">
-            Admin
+            {t.admin.shellBadge}
           </p>
         </div>
       </div>
@@ -45,7 +47,7 @@ export function AdminSidebar() {
               }
             >
               <span className="material-symbols-outlined">{item.icon}</span>
-              <span className="text-label-md">{item.label}</span>
+              <span className="text-label-md">{t.admin.nav[item.labelKey]}</span>
             </Link>
           );
         })}
@@ -59,7 +61,7 @@ export function AdminSidebar() {
           <span className="material-symbols-outlined text-[20px]">
             arrow_back
           </span>
-          Exit Admin
+          {t.nav.exitAdmin}
         </Link>
       </div>
     </aside>

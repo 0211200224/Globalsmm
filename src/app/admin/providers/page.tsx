@@ -2,8 +2,10 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { listProviders } from "@/lib/actions/admin-providers";
 import { formatUSD } from "@/lib/format";
 import { ProvidersView, type AdminProviderRow } from "./ProvidersView";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 export default async function AdminProvidersPage() {
+  const { admin: t } = await getDictionary();
   const dbProviders = await listProviders();
 
   const providers: AdminProviderRow[] = dbProviders.map((p) => ({
@@ -24,10 +26,9 @@ export default async function AdminProvidersPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Fulfillment Providers</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.providers.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Upstream SMM providers. Map a Service to one (see Services) to make it eligible for
-          approval-queue dispatch — services with no provider stay fully manual.
+          {t.providers.subtitle}
         </p>
       </div>
 

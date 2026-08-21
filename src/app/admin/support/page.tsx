@@ -2,8 +2,10 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { prisma } from "@/lib/prisma";
 import type { TicketStatus } from "@/lib/types/support";
 import { AdminSupportView, type AdminTicketRow } from "./AdminSupportView";
+import { getDictionary } from "@/lib/i18n/get-dictionary";
 
 export default async function AdminSupportPage() {
+  const { admin: t } = await getDictionary();
   const dbTickets = await prisma.supportTicket.findMany({
     include: { order: true, user: true, _count: { select: { messages: true } } },
     orderBy: { updatedAt: "desc" },
@@ -24,9 +26,9 @@ export default async function AdminSupportPage() {
   return (
     <AdminShell>
       <div>
-        <h2 className="text-headline-lg text-on-surface">Support</h2>
+        <h2 className="text-headline-lg text-on-surface">{t.support.title}</h2>
         <p className="text-body-md text-on-surface-variant mt-1">
-          Customer support tickets, optionally linked to a specific order.
+          {t.support.subtitle}
         </p>
       </div>
 

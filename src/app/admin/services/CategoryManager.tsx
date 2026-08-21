@@ -7,6 +7,8 @@ import {
   updateCategory,
   deleteCategory,
 } from "@/lib/actions/admin-catalog";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export type EditableCategory = {
   id: string;
@@ -18,6 +20,7 @@ export type EditableCategory = {
 
 export function CategoryManager({ categories }: { categories: EditableCategory[] }) {
   const router = useRouter();
+  const t = useTranslations().admin.services;
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState<EditableCategory | "new" | null>(null);
   const [name, setName] = useState("");
@@ -60,7 +63,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
   }
 
   async function handleDelete(category: EditableCategory) {
-    if (!confirm(`Delete platform "${category.name}"?`)) return;
+    if (!confirm(formatMessage(t.categoryDeleteConfirm, { name: category.name }))) return;
     const result = await deleteCategory(category.id);
     if (!result.success) {
       alert(result.error);
@@ -77,7 +80,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
         className="w-full flex items-center justify-between"
       >
         <h3 className="text-headline-md text-on-surface">
-          Platforms ({categories.length})
+          {formatMessage(t.platformsTitle, { count: categories.length })}
         </h3>
         <span className="material-symbols-outlined text-on-surface-variant">
           {expanded ? "expand_less" : "expand_more"}
@@ -100,7 +103,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
                     {category.name}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">
-                    {category.serviceCount} service(s)
+                    {formatMessage(t.serviceCountLabel, { count: category.serviceCount })}
                   </p>
                 </div>
               </div>
@@ -110,14 +113,14 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
                   onClick={() => startEdit(category)}
                   className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
                 >
-                  Edit
+                  {t.catEdit}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleDelete(category)}
                   className="px-3 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error/10 text-label-sm transition-colors"
                 >
-                  Delete
+                  {t.catDelete}
                 </button>
               </div>
             </div>
@@ -128,7 +131,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
             onClick={() => startEdit("new")}
             className="w-full py-2.5 rounded-lg border border-dashed border-outline-variant text-on-surface-variant hover:text-on-surface hover:border-tertiary transition-colors text-label-sm"
           >
-            + Add Platform
+            {t.addPlatform}
           </button>
         </div>
       )}
@@ -137,7 +140,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="glass-panel bg-surface-container-low border border-white/10 rounded-2xl w-full max-w-md p-6 shadow-2xl">
             <h4 className="text-headline-md text-on-surface mb-4">
-              {editing === "new" ? "New Platform" : "Edit Platform"}
+              {editing === "new" ? t.catNewTitle : t.catEditTitle}
             </h4>
             {error && (
               <div className="bg-error-container/20 border border-error/30 text-error text-body-sm rounded-lg px-4 py-3 mb-4">
@@ -146,7 +149,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-label-sm text-on-surface-variant">Name</label>
+                <label className="text-label-sm text-on-surface-variant">{t.catNameLabel}</label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
                   value={name}
@@ -156,7 +159,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
               </div>
               <div className="space-y-2">
                 <label className="text-label-sm text-on-surface-variant">
-                  Material icon name
+                  {t.catIconLabel}
                 </label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -166,7 +169,7 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
               </div>
               <div className="space-y-2">
                 <label className="text-label-sm text-on-surface-variant">
-                  Sort order
+                  {t.catSortLabel}
                 </label>
                 <input
                   className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -181,14 +184,14 @@ export function CategoryManager({ categories }: { categories: EditableCategory[]
                   onClick={() => setEditing(null)}
                   className="px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors"
                 >
-                  Cancel
+                  {t.catCancel}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
                   className="px-6 py-2 rounded-lg bg-tertiary text-on-tertiary font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
                 >
-                  {loading ? "Saving..." : "Save"}
+                  {loading ? t.catSaving : t.catSave}
                 </button>
               </div>
             </form>

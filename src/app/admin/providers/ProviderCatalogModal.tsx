@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { listProviderCatalog } from "@/lib/actions/admin-providers";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 type CatalogEntry = {
   id: string;
@@ -21,6 +23,7 @@ export function ProviderCatalogModal({
   providerName: string;
   onClose: () => void;
 }) {
+  const t = useTranslations().admin.providers;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [services, setServices] = useState<CatalogEntry[]>([]);
@@ -66,15 +69,17 @@ export function ProviderCatalogModal({
       <div className="glass-panel bg-surface-container-low border border-white/10 rounded-2xl w-full max-w-2xl p-6 md:p-8 shadow-2xl max-h-[85vh] flex flex-col">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h3 className="text-headline-md text-on-surface">{providerName} catalog</h3>
+            <h3 className="text-headline-md text-on-surface">
+              {formatMessage(t.catalogTitle, { name: providerName })}
+            </h3>
             <p className="text-label-sm text-on-surface-variant mt-1">
-              Copy the ID you need into the service&apos;s &quot;Provider&apos;s service ID&quot; field.
+              {t.catalogSubtitle}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.close}
             className="p-2 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container-high transition-all"
           >
             <span className="material-symbols-outlined">close</span>
@@ -84,7 +89,7 @@ export function ProviderCatalogModal({
         {!loading && !error && (
           <input
             className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40 mb-4"
-            placeholder="Search by name, ID, or category..."
+            placeholder={t.searchCatalogPlaceholder}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -93,7 +98,7 @@ export function ProviderCatalogModal({
         <div className="overflow-y-auto flex-1 -mx-2 px-2">
           {loading && (
             <p className="text-body-sm text-on-surface-variant py-8 text-center">
-              Fetching catalog…
+              {t.fetchingCatalog}
             </p>
           )}
           {error && (
@@ -103,17 +108,17 @@ export function ProviderCatalogModal({
           )}
           {!loading && !error && filtered.length === 0 && (
             <p className="text-body-sm text-on-surface-variant py-8 text-center">
-              No services match &quot;{query}&quot;.
+              {formatMessage(t.noCatalogMatch, { query })}
             </p>
           )}
           {!loading && !error && filtered.length > 0 && (
             <table className="w-full text-body-sm">
               <thead className="sticky top-0 bg-surface-container-low">
                 <tr className="text-left text-label-sm text-on-surface-variant border-b border-outline-variant/20">
-                  <th className="py-2 pr-2">ID</th>
-                  <th className="py-2 pr-2">Name</th>
-                  <th className="py-2 pr-2">Rate/1k</th>
-                  <th className="py-2 pr-2">Min / Max</th>
+                  <th className="py-2 pr-2">{t.colId}</th>
+                  <th className="py-2 pr-2">{t.colName}</th>
+                  <th className="py-2 pr-2">{t.colRate}</th>
+                  <th className="py-2 pr-2">{t.colMinMax}</th>
                   <th className="py-2" />
                 </tr>
               </thead>
@@ -139,7 +144,7 @@ export function ProviderCatalogModal({
                         onClick={() => handleCopy(s.id)}
                         className="px-2 py-1 rounded-lg border border-outline-variant text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
                       >
-                        {copiedId === s.id ? "Copied!" : "Copy ID"}
+                        {copiedId === s.id ? t.copied : t.copyId}
                       </button>
                     </td>
                   </tr>

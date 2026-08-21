@@ -7,6 +7,8 @@ import { Pill } from "@/components/ui/Pill";
 import { toggleServiceActive, deleteService } from "@/lib/actions/admin-catalog";
 import { CategoryManager, type EditableCategory } from "./CategoryManager";
 import { ServiceFormModal, type EditableService } from "./ServiceFormModal";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export type AdminServiceRow = EditableService & {
   categoryName: string;
@@ -23,6 +25,7 @@ export function ServicesAdminView({
   providers: { id: string; name: string }[];
 }) {
   const router = useRouter();
+  const t = useTranslations().admin.services;
   const [formTarget, setFormTarget] = useState<"new" | AdminServiceRow | null>(null);
   const [connectedOnly, setConnectedOnly] = useState(false);
 
@@ -36,7 +39,7 @@ export function ServicesAdminView({
   }
 
   async function handleDelete(row: AdminServiceRow) {
-    if (!confirm(`Delete "${row.name}"?`)) return;
+    if (!confirm(formatMessage(t.deleteConfirm, { name: row.name }))) return;
     const result = await deleteService(row.id);
     if (result.success && result.note) {
       alert(result.note);
@@ -46,7 +49,7 @@ export function ServicesAdminView({
 
   const columns: DataTableColumn<AdminServiceRow>[] = [
     {
-      header: "Service",
+      header: t.colService,
       render: (row) => (
         <div>
           <p className="text-body-sm font-medium text-on-surface">{row.name}</p>
@@ -55,11 +58,11 @@ export function ServicesAdminView({
       ),
     },
     {
-      header: "Platform",
+      header: t.colPlatform,
       render: (row) => <Pill tone="info">{row.categoryName}</Pill>,
     },
     {
-      header: "Price / 1k",
+      header: t.colPrice,
       render: (row) => (
         <span className="font-mono font-bold text-secondary">
           ${row.pricePer1000.toFixed(4)}
@@ -67,24 +70,24 @@ export function ServicesAdminView({
       ),
     },
     {
-      header: "Min / Max",
+      header: t.colMinMax,
       render: (row) =>
         `${row.minQuantity.toLocaleString("en-US")} / ${row.maxQuantity.toLocaleString("en-US")}`,
     },
     {
-      header: "Status",
+      header: t.colStatus,
       render: (row) => (
         <Pill tone={row.active ? "positive" : "neutral"}>
-          {row.active ? "Active" : "Inactive"}
+          {row.active ? t.active : t.inactive}
         </Pill>
       ),
     },
     {
-      header: "Fulfillment",
+      header: t.colFulfillment,
       render: (row) => {
         const connected = Boolean(row.providerId && row.externalServiceId);
         return (
-          <div className="flex items-center gap-2" title={connected ? "Connected to a provider" : "Manual — no provider mapped"}>
+          <div className="flex items-center gap-2" title={connected ? t.connectedTooltip : t.manualTooltip}>
             <span
               className={
                 connected
@@ -93,14 +96,14 @@ export function ServicesAdminView({
               }
             />
             <span className="text-label-sm text-on-surface-variant">
-              {connected ? "Connected" : "Manual"}
+              {connected ? t.connected : t.manual}
             </span>
           </div>
         );
       },
     },
     {
-      header: "Actions",
+      header: t.colActions,
       align: "right",
       render: (row) => (
         <div className="flex justify-end gap-2">
@@ -109,21 +112,21 @@ export function ServicesAdminView({
             onClick={() => setFormTarget(row)}
             className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
           >
-            Edit
+            {t.edit}
           </button>
           <button
             type="button"
             onClick={() => handleToggleActive(row)}
             className="px-3 py-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high text-label-sm transition-colors"
           >
-            {row.active ? "Deactivate" : "Activate"}
+            {row.active ? t.deactivate : t.activateBtn}
           </button>
           <button
             type="button"
             onClick={() => handleDelete(row)}
             className="px-3 py-1.5 rounded-lg border border-error/30 text-error hover:bg-error/10 text-label-sm transition-colors"
           >
-            Remove
+            {t.remove}
           </button>
         </div>
       ),
@@ -134,9 +137,9 @@ export function ServicesAdminView({
     <>
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-gutter">
         <div>
-          <h2 className="text-headline-lg text-on-surface">Services</h2>
+          <h2 className="text-headline-lg text-on-surface">{t.title}</h2>
           <p className="text-body-md text-on-surface-variant mt-1">
-            Catálogo, preços e disponibilidade dos serviços vendidos.
+            {t.subtitle}
           </p>
         </div>
         <button
@@ -145,14 +148,14 @@ export function ServicesAdminView({
           className="px-6 py-2.5 rounded-lg bg-tertiary text-on-tertiary font-bold flex items-center gap-2 hover:opacity-90 active:scale-95 transition-all w-fit"
         >
           <span className="material-symbols-outlined text-[20px]">add</span>
-          New Service
+          {t.newService}
         </button>
       </div>
 
       <CategoryManager categories={categories} />
 
       <DataTable
-        title={`${visibleServices.length} of ${services.length} services`}
+        title={formatMessage(t.tableTitle, { visible: visibleServices.length, total: services.length })}
         action={
           <label className="flex items-center gap-2 text-label-sm text-on-surface-variant cursor-pointer select-none">
             <input
@@ -161,17 +164,13 @@ export function ServicesAdminView({
               onChange={(e) => setConnectedOnly(e.target.checked)}
               className="w-4 h-4 rounded border-outline-variant accent-tertiary cursor-pointer"
             />
-            Connected only
+            {t.connectedOnlyLabel}
           </label>
         }
         columns={columns}
         rows={visibleServices}
         rowKey={(row) => row.id}
-        emptyMessage={
-          connectedOnly
-            ? "No services are connected to a provider yet."
-            : "No services yet — create one to get started."
-        }
+        emptyMessage={connectedOnly ? t.noConnected : t.noServices}
       />
 
       {formTarget && (

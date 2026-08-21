@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createService, updateService, type ServiceInput } from "@/lib/actions/admin-catalog";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
 
 export type EditableService = {
   id: string;
@@ -36,6 +37,7 @@ export function ServiceFormModal({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations().admin.services;
   const [form, setForm] = useState<ServiceInput>(
     existing ?? {
       categoryId: categories[0]?.id ?? "",
@@ -84,12 +86,12 @@ export function ServiceFormModal({
       <div className="glass-panel bg-surface-container-low border border-white/10 rounded-2xl w-full max-w-2xl p-6 md:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-start mb-6">
           <h3 className="text-headline-md text-on-surface">
-            {existing ? "Edit Service" : "New Service"}
+            {existing ? t.formTitleEdit : t.formTitleNew}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.closeAria}
             className="p-2 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container-high transition-all"
           >
             <span className="material-symbols-outlined">close</span>
@@ -104,7 +106,7 @@ export function ServiceFormModal({
 
         <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-gutter">
           <div className="md:col-span-2 space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Service name</label>
+            <label className="text-label-sm text-on-surface-variant">{t.nameLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.name}
@@ -114,7 +116,7 @@ export function ServiceFormModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Platform</label>
+            <label className="text-label-sm text-on-surface-variant">{t.platformLabel}</label>
             <select
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.categoryId}
@@ -130,7 +132,7 @@ export function ServiceFormModal({
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Service type (e.g. Followers, Likes, Views)
+              {t.serviceTypeLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -141,7 +143,7 @@ export function ServiceFormModal({
           </div>
 
           <div className="md:col-span-2 space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Description</label>
+            <label className="text-label-sm text-on-surface-variant">{t.descriptionLabel}</label>
             <textarea
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               rows={2}
@@ -151,7 +153,7 @@ export function ServiceFormModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Price per 1000 (USD)</label>
+            <label className="text-label-sm text-on-surface-variant">{t.priceLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               type="number"
@@ -164,17 +166,17 @@ export function ServiceFormModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Delivery speed label</label>
+            <label className="text-label-sm text-on-surface-variant">{t.speedLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.speedLabel}
               onChange={(e) => setForm({ ...form, speedLabel: e.target.value })}
-              placeholder="Instant, 10m / 1k, 24 hours..."
+              placeholder={t.speedPlaceholder}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Min quantity</label>
+            <label className="text-label-sm text-on-surface-variant">{t.minQtyLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               type="number"
@@ -186,7 +188,7 @@ export function ServiceFormModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Max quantity</label>
+            <label className="text-label-sm text-on-surface-variant">{t.maxQtyLabel}</label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               type="number"
@@ -199,33 +201,33 @@ export function ServiceFormModal({
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Material icon name
+              {t.iconLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.icon}
               onChange={(e) => setForm({ ...form, icon: e.target.value })}
-              placeholder="group, favorite, visibility..."
+              placeholder={t.iconPlaceholder}
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Badge (optional)</label>
+            <label className="text-label-sm text-on-surface-variant">{t.badgeLabel}</label>
             <select
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.badge ?? ""}
               onChange={(e) => setForm({ ...form, badge: e.target.value || null })}
             >
-              <option value="">None</option>
-              <option value="Hot">Hot</option>
-              <option value="Stable">Stable</option>
-              <option value="Elite">Elite</option>
+              <option value="">{t.badgeNone}</option>
+              <option value="Hot">{t.badgeHot}</option>
+              <option value="Stable">{t.badgeStable}</option>
+              <option value="Elite">{t.badgeElite}</option>
             </select>
           </div>
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Quality score (0-10, optional)
+              {t.qualityLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -240,13 +242,13 @@ export function ServiceFormModal({
                   qualityScore: e.target.value === "" ? null : Number(e.target.value),
                 })
               }
-              placeholder="e.g. 9.4"
+              placeholder={t.qualityPlaceholder}
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Avg. retention % (0-100, optional)
+              {t.retentionLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -260,13 +262,13 @@ export function ServiceFormModal({
                   retentionPercent: e.target.value === "" ? null : Number(e.target.value),
                 })
               }
-              placeholder="e.g. 90"
+              placeholder={t.retentionPlaceholder}
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Refill guarantee (days, 0 = none)
+              {t.refillLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -277,28 +279,27 @@ export function ServiceFormModal({
               required
             />
             <p className="text-label-sm text-on-surface-variant/60">
-              Customers can self-serve one auto-approved refill within this window.
+              {t.refillHint}
             </p>
           </div>
 
           <div className="md:col-span-2 border-t border-outline-variant/20 pt-4 mt-2">
             <p className="text-label-sm text-on-surface-variant font-bold uppercase tracking-wide mb-1">
-              Fulfillment (optional)
+              {t.fulfillmentSection}
             </p>
             <p className="text-label-sm text-on-surface-variant/60">
-              Leave the provider unset to keep this service fully manual — approving an order
-              in the queue will just move it to Processing without calling any API.
+              {t.fulfillmentHint}
             </p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-label-sm text-on-surface-variant">Provider</label>
+            <label className="text-label-sm text-on-surface-variant">{t.providerLabel}</label>
             <select
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.providerId ?? ""}
               onChange={(e) => setForm({ ...form, providerId: e.target.value || null })}
             >
-              <option value="">None (manual)</option>
+              <option value="">{t.providerNone}</option>
               {providers.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -309,19 +310,19 @@ export function ServiceFormModal({
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Provider&apos;s service ID
+              {t.externalIdLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
               value={form.externalServiceId ?? ""}
               onChange={(e) => setForm({ ...form, externalServiceId: e.target.value || null })}
-              placeholder="e.g. 4512"
+              placeholder={t.externalIdPlaceholder}
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-label-sm text-on-surface-variant">
-              Provider cost per 1000 (USD, optional)
+              {t.costLabel}
             </label>
             <input
               className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-2.5 px-3 text-on-surface outline-none focus:ring-2 focus:ring-tertiary/40"
@@ -335,7 +336,7 @@ export function ServiceFormModal({
                   costPer1000: e.target.value === "" ? null : Number(e.target.value),
                 })
               }
-              placeholder="Shown next to the customer price in the approval queue"
+              placeholder={t.costPlaceholder}
             />
           </div>
 
@@ -345,14 +346,14 @@ export function ServiceFormModal({
               onClick={onClose}
               className="px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface transition-colors"
             >
-              Cancel
+              {t.cancel}
             </button>
             <button
               type="submit"
               disabled={loading}
               className="px-6 py-2 rounded-lg bg-tertiary text-on-tertiary font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-60"
             >
-              {loading ? "Saving..." : existing ? "Save Changes" : "Create Service"}
+              {loading ? t.saving : existing ? t.saveChanges : t.createService}
             </button>
           </div>
         </form>

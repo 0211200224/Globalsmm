@@ -6,6 +6,8 @@ import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { updateOrderStatus, checkOrderStatus } from "@/lib/actions/admin-orders";
 import type { OrderRowStatus } from "@/lib/types/orders";
+import { useTranslations } from "@/lib/i18n/I18nProvider";
+import { formatMessage } from "@/lib/i18n/format-message";
 
 export type AdminOrderRow = {
   id: string;
@@ -31,9 +33,21 @@ const statusOptions: OrderRowStatus[] = [
 
 export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderRow[] }) {
   const router = useRouter();
+  const t = useTranslations();
   const [orders, setOrders] = useState(initialOrders);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const statusLabels: Record<OrderRowStatus, string> = {
+    PENDING: t.orders.statusPending,
+    PENDING_ADMIN: t.orders.statusPendingAdmin,
+    PROCESSING: t.orders.statusProcessing,
+    IN_PROGRESS: t.orders.statusInProgress,
+    COMPLETED: t.orders.statusCompleted,
+    PARTIAL: t.orders.statusPartial,
+    CANCELED: t.orders.statusCanceled,
+    REFUNDED: t.orders.statusRefunded,
+  };
 
   function handleStatusChange(id: string, status: OrderRowStatus) {
     const previous = orders;
@@ -45,7 +59,7 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
       setPendingId(null);
       if (!result.success) {
         setOrders(previous);
-        alert(result.error ?? "Failed to update order status.");
+        alert(result.error ?? t.admin.orders.updateFailed);
         return;
       }
       router.refresh();
@@ -61,14 +75,14 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
         alert(result.error);
         return;
       }
-      alert(`Provider reports: ${result.providerStatus}`);
+      alert(formatMessage(t.admin.orders.providerReports, { status: result.providerStatus }));
       router.refresh();
     });
   }
 
   const columns: DataTableColumn<AdminOrderRow>[] = [
     {
-      header: "Order",
+      header: t.admin.orders.colOrder,
       render: (row) => (
         <div>
           <p className="font-mono text-sm text-on-surface-variant">
@@ -78,15 +92,15 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
         </div>
       ),
     },
-    { header: "Customer", render: (row) => row.customerName },
-    { header: "Date", render: (row) => row.createdAtLabel },
+    { header: t.admin.orders.colCustomer, render: (row) => row.customerName },
+    { header: t.admin.orders.colDate, render: (row) => row.createdAtLabel },
     {
-      header: "Amount",
+      header: t.admin.orders.colAmount,
       align: "right",
       render: (row) => <span className="font-bold">{row.amount}</span>,
     },
     {
-      header: "Status",
+      header: t.admin.orders.colStatus,
       render: (row) => (
         <div className="flex items-center gap-3">
           <StatusBadge status={row.status} />
@@ -100,7 +114,7 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
           >
             {statusOptions.map((status) => (
               <option key={status} value={status}>
-                {status}
+                {statusLabels[status]}
               </option>
             ))}
           </select>
@@ -109,7 +123,7 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
               type="button"
               disabled={isPending && pendingId === row.id}
               onClick={() => handleCheckStatus(row.id)}
-              title="Fetch the live status from the provider"
+              title={t.admin.orders.checkStatusTitle}
               className="p-1.5 rounded-lg border border-outline-variant text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors disabled:opacity-50"
             >
               <span className="material-symbols-outlined text-[18px]">sync</span>
@@ -122,11 +136,11 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
 
   return (
     <DataTable
-      title={`${orders.length} orders`}
+      title={formatMessage(t.admin.orders.tableTitle, { count: orders.length })}
       columns={columns}
       rows={orders}
       rowKey={(row) => row.id}
-      emptyMessage="No orders placed yet."
+      emptyMessage={t.admin.orders.noOrders}
     />
   );
 }
