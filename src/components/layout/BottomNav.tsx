@@ -20,14 +20,16 @@ export function BottomNav() {
             href={item.href}
             className={
               active
-                ? "flex flex-col items-center gap-1 text-primary"
-                : "flex flex-col items-center gap-1 text-on-surface-variant"
+                ? "flex-1 min-w-0 flex flex-col items-center gap-1 text-primary"
+                : "flex-1 min-w-0 flex flex-col items-center gap-1 text-on-surface-variant"
             }
           >
             <span className="material-symbols-outlined text-[22px]">
               {item.icon}
             </span>
-            <span className="text-[10px] font-medium">{t.nav[item.labelKey]}</span>
+            <span className="text-[10px] font-medium truncate max-w-full">
+              {t.nav[item.labelKey]}
+            </span>
           </Link>
         );
       })}

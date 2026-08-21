@@ -102,7 +102,7 @@ export function AdminOrdersView({ orders: initialOrders }: { orders: AdminOrderR
     {
       header: t.admin.orders.colStatus,
       render: (row) => (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <StatusBadge status={row.status} />
           <select
             className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg text-label-sm px-2 py-1 text-on-surface-variant focus:ring-1 focus:ring-tertiary outline-none disabled:opacity-50"

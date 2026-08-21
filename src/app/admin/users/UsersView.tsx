@@ -143,7 +143,7 @@ export function UsersView({
       header: t.colActions,
       align: "right",
       render: (row) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex flex-wrap justify-end gap-1.5 sm:gap-2 max-w-55 sm:max-w-none ml-auto">
           <button
             type="button"
             disabled={adjustingId === row.id}

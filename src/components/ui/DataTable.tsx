@@ -26,7 +26,7 @@ export function DataTable<T>({
   return (
     <div className="glass-panel rounded-xl overflow-hidden">
       {(title || action) && (
-        <div className="p-stack-md flex justify-between items-center border-b border-outline-variant/10">
+        <div className="p-stack-md flex flex-wrap justify-between items-center gap-3 border-b border-outline-variant/10">
           {title && (
             <h4 className="text-headline-md font-bold text-on-surface">
               {title}
@@ -42,7 +42,7 @@ export function DataTable<T>({
               {columns.map((col) => (
                 <th
                   key={col.header}
-                  className={`px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider ${
+                  className={`px-4 md:px-6 py-4 text-label-sm font-bold text-on-surface-variant uppercase tracking-wider whitespace-nowrap ${
                     col.align === "right" ? "text-right" : ""
                   }`}
                 >
@@ -56,7 +56,7 @@ export function DataTable<T>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-6 py-10 text-center text-body-sm text-on-surface-variant"
+                  className="px-4 md:px-6 py-10 text-center text-body-sm text-on-surface-variant"
                 >
                   {emptyMessage}
                 </td>
@@ -70,7 +70,7 @@ export function DataTable<T>({
                   {columns.map((col) => (
                     <td
                       key={col.header}
-                      className={`px-6 py-4 ${
+                      className={`px-4 md:px-6 py-4 ${
                         col.align === "right" ? "text-right" : ""
                       }`}
                     >
